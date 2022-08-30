@@ -12,7 +12,7 @@ namespace CyberHejmiBot.Modules
 	{
 		[Command("say")]
 		[Summary("Echoes a message.")]
-		public Task SayAsync([Remainder][Summary("The text to echo")] string echo)
+		public Task SayAsync([Remainder][Summary("The text to echos")] string echo)
 			=> ReplyAsync(echo);
 
 	}
