@@ -34,10 +34,8 @@ namespace CyberHejmiBot.Configuration.Startup
 
             var config = new DiscordSocketConfig();
             var commandServiceConfig = new CommandServiceConfig();
-            var botSettings = new BotSettings()
-            {
-                BotToken = Environment.GetEnvironmentVariable("DISCORD_KEY")
-            };
+            var botSettings = JsonConvert.DeserializeObject<BotSettings>(File.ReadAllText("BotSettings.json"))
+                ?? new BotSettings();
 
             collection
                 .AddSingleton(config)
