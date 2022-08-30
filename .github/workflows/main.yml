@@ -16,3 +16,4 @@ jobs:
           heroku_app_name: ${{secrets.HEROKU_APP}}
           heroku_email: ${{secrets.HEROKU_USERNAME}}
           usedocker: true
+          docker_heroku_process_type: worker
