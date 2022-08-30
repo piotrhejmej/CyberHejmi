@@ -18,3 +18,5 @@ jobs:
           docker_heroku_process_type: "worker"
           procfile: "worker dotnet run"
           usedocker: true
+        env:
+          DISCORD_KEY: ${{secrets.DISCORD_TOKEN}}
