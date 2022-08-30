@@ -1,4 +1,5 @@
-﻿using CyberHejmiBot.Configuration.Loging;
+﻿using CyberHejmiBot.Business.Events;
+using CyberHejmiBot.Configuration.Loging;
 using CyberHejmiBot.Configuration.Settings;
 using Discord;
 using Discord.WebSocket;
@@ -21,18 +22,21 @@ namespace CyberHejmiBot.Configuration.Startup
         private readonly TextCommandHandler CommandHandler;
         private readonly ILogger Logger;
         private readonly BotSettings BotSettings;
+        private readonly IEventListener EventListener;
 
-        public Startup(DiscordSocketClient client, TextCommandHandler commandHandler, ILogger logger, BotSettings botSettings)
+        public Startup(DiscordSocketClient client, TextCommandHandler commandHandler, ILogger logger, BotSettings botSettings, IEventListener eventListener)
         {
             Client = client;
             CommandHandler = commandHandler;
             Logger = logger;
             BotSettings = botSettings;
+            EventListener = eventListener;
         }
 
         public async Task Init()
         {
             await CommandHandler.InstallCommandsAsync();
+            await EventListener.StartAsync();
 
             Client.Log += Logger.Log;
 

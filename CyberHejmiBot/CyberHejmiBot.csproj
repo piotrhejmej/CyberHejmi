@@ -9,12 +9,19 @@
 
   <ItemGroup>
     <PackageReference Include="Discord.Net" Version="3.7.2" />
+    <PackageReference Include="MediatR" Version="10.0.1" />
+    <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Business\Events\" />
     <Folder Include="Business\SlashCommands\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="BotSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,10 @@
-﻿using CyberHejmiBot.Configuration.Loging;
+﻿using CyberHejmiBot.Business.Events;
+using CyberHejmiBot.Business.Events.GuildEvents;
+using CyberHejmiBot.Configuration.Loging;
 using CyberHejmiBot.Configuration.Settings;
 using Discord.Commands;
 using Discord.WebSocket;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -17,6 +20,9 @@ namespace CyberHejmiBot.Configuration.Startup
         public static IServiceProvider CreateProvider()
         {
             var serviceCollection = RegisterServices();
+
+            serviceCollection
+                .AddMediatR(typeof(Program));
 
             return serviceCollection.BuildServiceProvider();
         }
@@ -39,8 +45,9 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddSingleton(botSettings)
                 .AddScoped<TextCommandHandler>()
                 .AddScoped<ILogger, ConsoleLogger>()
+                .AddScoped<IGuildEventsListener, GuildEventsListener>()
+                .AddScoped<IEventListener, EventListener>()
                 .AddScoped<IStartup, Startup>();
-
 
             return collection;
         }
