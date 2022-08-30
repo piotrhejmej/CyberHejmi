@@ -8,6 +8,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{CAD2A325-B474-4A78-8B9B-E331A5AA3E4A}"
 	ProjectSection(SolutionItems) = preProject
 		Dockerfile = Dockerfile
+		.github\workflows\dotnet.yml = .github\workflows\dotnet.yml
+		.github\workflows\main.yml = .github\workflows\main.yml
 	EndProjectSection
 EndProject
 Global
