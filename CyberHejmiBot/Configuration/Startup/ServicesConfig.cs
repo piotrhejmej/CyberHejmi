@@ -9,11 +9,9 @@ using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Hangfire;
+using Hangfire.PostgreSql;
+using CyberHejmiBot.Configuration.Hangfire;
 
 namespace CyberHejmiBot.Configuration.Startup
 {
@@ -56,8 +54,8 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<ILogger, ConsoleLogger>()
                 .AddScoped<IGuildEventsListener, GuildEventsListener>()
                 .AddScoped<IEventListener, EventListener>()
-                .AddScoped<IStartup, Startup>();
-                
+                .AddScoped<IStartup, Startup>()
+                .AddScoped<HangfireTest>();
 
             return collection;
         }
