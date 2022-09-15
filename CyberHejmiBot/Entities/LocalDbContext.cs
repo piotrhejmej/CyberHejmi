@@ -3,6 +3,7 @@ using CyberHejmiBot.Entities.Test;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -17,6 +18,12 @@ namespace CyberHejmiBot.Entities
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            foreach(DictionaryEntry e in Environment.GetEnvironmentVariables())
+            {
+                Console.WriteLine(e.Key + ":" + e.Value);
+                Debug.WriteLine(e.Key + ":" + e.Value);
+            }
+
             optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("DISCORD_KEY"));
         }
 
