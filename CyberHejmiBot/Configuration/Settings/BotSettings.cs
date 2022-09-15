@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Configuration.Settings
 {
-    internal class BotSettings
+    public class BotSettings
     {
         public string? BotToken { get; set; }
     }
+
 }
