@@ -18,15 +18,7 @@ namespace CyberHejmiBot.Entities
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            foreach(DictionaryEntry e in Environment.GetEnvironmentVariables())
-            {
-                Console.WriteLine(e.Key + ":" + e.Value);
-                Debug.WriteLine(e.Key + ":" + e.Value);
-            }
             var connectionString = Environment.GetEnvironmentVariable("Db_ConnectionString");
-
-            Console.WriteLine(connectionString);
-            Debug.WriteLine(connectionString);
 
             optionsBuilder.UseNpgsql(connectionString);
         }
