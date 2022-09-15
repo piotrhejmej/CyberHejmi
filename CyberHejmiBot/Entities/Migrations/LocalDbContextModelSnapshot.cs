@@ -38,7 +38,7 @@ namespace CyberHejmiBot.Entities.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TestEntities");
+                    b.ToTable("TestEntities", (string)null);
                 });
 #pragma warning restore 612, 618
         }

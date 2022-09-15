@@ -1,10 +1,13 @@
 ﻿using CyberHejmiBot.Configuration;
+using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Configuration.Startup;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.Commands;
 using Discord.Rest;
 using Discord.WebSocket;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,15 +21,26 @@ public class Program
     {
         using (var services = ServicesConfig.CreateProvider())
         {
-            var dbContext = services.GetRequiredService<LocalDbContext>();
-            
-            dbContext.Database.Migrate();
-            dbContext.Seed();
+            GlobalConfiguration.Configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseColouredConsoleLogProvider()
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
+                .UseActivator(new HangfireJobActivator(services));
 
-            var startup = services.GetRequiredService<IStartup>();
-            await startup.Init();
+            using (var server = new BackgroundJobServer())
+            {
+                var dbContext = services.GetRequiredService<LocalDbContext>();
 
-            await Task.Delay(-1);
+                dbContext.Database.Migrate();
+                dbContext.Seed();
+
+                var startup = services.GetRequiredService<IStartup>();
+                await startup.Init();
+
+                await Task.Delay(-1);
+            }
         }
     }
 }

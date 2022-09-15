@@ -1,7 +1,12 @@
-﻿using CyberHejmiBot.Entities;
+﻿using CyberHejmiBot.Configuration.Hangfire;
+using CyberHejmiBot.Configuration.Loging;
+using CyberHejmiBot.Entities;
+using Discord;
 using Discord.Commands;
+using Hangfire;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,11 +16,15 @@ namespace CyberHejmiBot.Modules
 	[Group("test")]
 	public class TestModule : ModuleBase<SocketCommandContext>
 	{
-		public readonly LocalDbContext Context;
+		private readonly LocalDbContext Context;
+		private readonly IBackgroundJobClient BackgroundJobClient;
+		private readonly ILogger Logger;
 
-        public TestModule(LocalDbContext context): base()
+		public TestModule(LocalDbContext context, ILogger logger) : base()
         {
             Context = context;
+			Logger = logger;
+			//BackgroundJobClient = backgroundJobClient;
         }
 
         [Command("say")]
@@ -33,7 +42,15 @@ namespace CyberHejmiBot.Modules
 				return;
 
 			await ReplyAsync($"from db: {test.Id} {test.Name} {test.Description}");
-        }
+		}
 
+		public async Task testc()
+        {
+			await ReplyAsync("after a while testc");
+		}
+		public void testd()
+		{
+			ReplyAsync("after a while testd").Wait();
+		}
 	}
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Configuration.Loging
 {
-    interface ILogger
+    public interface ILogger
     {
         Task Log(LogMessage msg);
     }
