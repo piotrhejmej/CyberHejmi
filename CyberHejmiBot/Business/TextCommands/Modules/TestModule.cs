@@ -17,14 +17,10 @@ namespace CyberHejmiBot.Modules
 	public class TestModule : ModuleBase<SocketCommandContext>
 	{
 		private readonly LocalDbContext Context;
-		private readonly IBackgroundJobClient BackgroundJobClient;
-		private readonly ILogger Logger;
 
-		public TestModule(LocalDbContext context, ILogger logger) : base()
+		public TestModule(LocalDbContext context) : base()
         {
             Context = context;
-			Logger = logger;
-			//BackgroundJobClient = backgroundJobClient;
         }
 
         [Command("say")]
@@ -42,15 +38,6 @@ namespace CyberHejmiBot.Modules
 				return;
 
 			await ReplyAsync($"from db: {test.Id} {test.Name} {test.Description}");
-		}
-
-		public async Task testc()
-        {
-			await ReplyAsync("after a while testc");
-		}
-		public void testd()
-		{
-			ReplyAsync("after a while testd").Wait();
 		}
 	}
 }
