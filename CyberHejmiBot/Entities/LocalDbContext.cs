@@ -17,7 +17,7 @@ namespace CyberHejmiBot.Entities
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("Db_ConnectionString"));
+            optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("DISCORD_KEY"));
         }
 
         public void Seed()
