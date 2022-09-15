@@ -23,8 +23,12 @@ namespace CyberHejmiBot.Entities
                 Console.WriteLine(e.Key + ":" + e.Value);
                 Debug.WriteLine(e.Key + ":" + e.Value);
             }
+            var connectionString = Environment.GetEnvironmentVariable("Db_ConnectionString");
 
-            optionsBuilder.UseNpgsql(Environment.GetEnvironmentVariable("DISCORD_KEY"));
+            Console.WriteLine(connectionString);
+            Debug.WriteLine(connectionString);
+
+            optionsBuilder.UseNpgsql(connectionString);
         }
 
         public void Seed()
