@@ -2,9 +2,11 @@
 using CyberHejmiBot.Business.Events.GuildEvents;
 using CyberHejmiBot.Configuration.Loging;
 using CyberHejmiBot.Configuration.Settings;
+using CyberHejmiBot.Entities;
 using Discord.Commands;
 using Discord.WebSocket;
 using MediatR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
@@ -17,7 +19,7 @@ namespace CyberHejmiBot.Configuration.Startup
 {
     internal static class ServicesConfig
     {
-        public static IServiceProvider CreateProvider()
+        public static ServiceProvider CreateProvider()
         {
             var serviceCollection = RegisterServices();
 
@@ -30,14 +32,21 @@ namespace CyberHejmiBot.Configuration.Startup
         private static IServiceCollection RegisterServices()
         {
             var collection = new ServiceCollection();
-
-
+           
             var config = new DiscordSocketConfig();
             var commandServiceConfig = new CommandServiceConfig();
             var botSettings = JsonConvert.DeserializeObject<BotSettings>(File.ReadAllText("BotSettings.json"))
                 ?? new BotSettings();
 
+            var _builder = new ConfigurationBuilder()
+                .SetBasePath(AppContext.BaseDirectory)
+                .AddJsonFile(path: "BotSettings.json");
+
+            var configuration = _builder.Build();
+
             collection
+                .AddSingleton(configuration)
+                .AddDbContext<LocalDbContext>()
                 .AddSingleton(config)
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton(commandServiceConfig)
@@ -48,6 +57,7 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<IGuildEventsListener, GuildEventsListener>()
                 .AddScoped<IEventListener, EventListener>()
                 .AddScoped<IStartup, Startup>();
+                
 
             return collection;
         }
