@@ -43,8 +43,6 @@ namespace CyberHejmiBot.Business.Events.GuildEvents.GuildEventCreatedScope
 
             await textChannel.SendMessageAsync($"Welcome to {request.guildEvent.Name}, a channel created for event!");
 
-            BackgroundJob.Schedule<HangfireTest>(x => x.DoSomething(textChannel.GuildId, textChannel.Id), TimeSpan.FromSeconds(10));
-            
             return Unit.Value;
         }
     }

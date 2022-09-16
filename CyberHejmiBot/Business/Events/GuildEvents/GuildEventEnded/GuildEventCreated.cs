@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using CyberHejmiBot.Business.Jobs;
+using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using MediatR;
@@ -10,19 +11,37 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.Events.GuildEvents.GuildEventEndedScope
 {
-    internal record GuildEventEnded(SocketGuildEvent guildEvent) : IRequest<Unit>;
+    public record GuildEventEndedCommand(SocketGuildEvent guildEvent) : IRequest<Unit>;
 
-    internal class GuildEventEndedHandler : IRequestHandler<GuildEventEnded, Unit>
+    public class GuildEventEndedHandler : IRequestHandler<GuildEventEndedCommand, Unit>
     {
-        public async Task<Unit> Handle(GuildEventEnded request, CancellationToken cancellationToken)
+        private readonly IRemoveEventTextChannelJob RemoveEventTextChannelJob;
+        private readonly DiscordSocketClient Client;
+
+        public GuildEventEndedHandler(IRemoveEventTextChannelJob removeEventTextChannelJob, DiscordSocketClient client)
+        {
+            RemoveEventTextChannelJob = removeEventTextChannelJob;
+            Client = client;
+        }
+
+        public async Task<Unit> Handle(GuildEventEndedCommand request, CancellationToken cancellationToken)
         {
             var guild = request.guildEvent.Guild;
-            var textChannel = guild.Channels.FirstOrDefault(ch => ch.Name.Equals(request.guildEvent.Name, StringComparison.OrdinalIgnoreCase));
+            var textChannel = guild.Channels.FirstOrDefault(ch => ch.Name.Replace('-', ' ').Equals(request.guildEvent.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (textChannel != null)
-            {
-                await textChannel.DeleteAsync();
-            }
+            if (textChannel == null)
+                return Unit.Value;
+
+            var restChannel = (await Client
+                .Rest
+                .GetChannelAsync(textChannel.Id)) as RestTextChannel;
+
+            if (restChannel == null)
+                return Unit.Value;
+
+            await restChannel.SendMessageAsync("Bujah");
+
+            RemoveEventTextChannelJob.ScheduleRemoveTextChannel(request, textChannel.Id);
 
             return Unit.Value;
         }
