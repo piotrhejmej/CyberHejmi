@@ -28,7 +28,7 @@ namespace CyberHejmiBot.Business.Jobs
         {
             BackgroundJob.Schedule<IRemoveEventTextChannelJob>(
                 x => x.RemoveTextChannel(eventEnded.guildEvent.Guild.Id, channelId),
-                TimeSpan.FromSeconds(10));
+                TimeSpan.FromDays(1));
         }
 
         public async Task RemoveTextChannel(ulong guildId, ulong textChannelId)
