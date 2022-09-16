@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using Hangfire;
 using Hangfire.PostgreSql;
 using CyberHejmiBot.Configuration.Hangfire;
+using CyberHejmiBot.Business.Jobs;
+using CyberHejmiBot.Business.SuperSpecial;
 
 namespace CyberHejmiBot.Configuration.Startup
 {
@@ -55,7 +57,8 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<IGuildEventsListener, GuildEventsListener>()
                 .AddScoped<IEventListener, EventListener>()
                 .AddScoped<IStartup, Startup>()
-                .AddScoped<HangfireTest>();
+                .AddScoped<IRemoveEventTextChannelJob, RemoveEventTextChannelJob>()
+                .AddScoped<ISuperSpecialLover, SuperSpecialLover>();
 
             return collection;
         }

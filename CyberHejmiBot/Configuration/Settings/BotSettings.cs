@@ -8,7 +8,7 @@ namespace CyberHejmiBot.Configuration.Settings
 {
     public class BotSettings
     {
-        public string? BotToken { get; set; }
+        public string? Dummy { get; set; }
     }
 
 }

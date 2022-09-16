@@ -24,8 +24,8 @@ namespace CyberHejmiBot.Business.Events.GuildEvents
         public Task StartAsync()
         {
             Client.GuildScheduledEventCreated += (SocketGuildEvent guildEvent) => Mediator.Send(new GuildEventCreated(guildEvent));
-            Client.GuildScheduledEventCompleted += (SocketGuildEvent guildEvent) => Mediator.Send(new GuildEventEnded(guildEvent));
-            Client.GuildScheduledEventCancelled += (SocketGuildEvent guildEvent) => Mediator.Send(new GuildEventEnded(guildEvent));
+            Client.GuildScheduledEventCompleted += (SocketGuildEvent guildEvent) => Mediator.Send(new GuildEventEndedCommand(guildEvent));
+            Client.GuildScheduledEventCancelled += (SocketGuildEvent guildEvent) => Mediator.Send(new GuildEventEndedCommand(guildEvent));
 
             return Task.FromResult(Unit.Value);
         }
