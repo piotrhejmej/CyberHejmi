@@ -39,7 +39,12 @@ namespace CyberHejmiBot.Business.Events.GuildEvents.GuildEventEndedScope
             if (restChannel == null)
                 return Unit.Value;
 
-            await restChannel.SendMessageAsync("Bujah");
+            var embedBuilder = new EmbedBuilder()
+                .WithColor(Color.Red)
+                .WithTitle("All good thing once ends...")
+                .WithDescription($"{request.guildEvent.Name} ended.\nChannel will be up and running for another Day\nGather memories, backup your photos and see you next time!");
+
+            await restChannel.SendMessageAsync(embed: embedBuilder.Build());
 
             RemoveEventTextChannelJob.ScheduleRemoveTextChannel(request, textChannel.Id);
 
