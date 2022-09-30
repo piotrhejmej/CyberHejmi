@@ -14,6 +14,8 @@ using Hangfire.PostgreSql;
 using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Business.Jobs;
 using CyberHejmiBot.Business.SuperSpecial;
+using System.Reflection;
+using CyberHejmiBot.Business.SlashCommands;
 
 namespace CyberHejmiBot.Configuration.Startup
 {
@@ -58,9 +60,50 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<IEventListener, EventListener>()
                 .AddScoped<IStartup, Startup>()
                 .AddScoped<IRemoveEventTextChannelJob, RemoveEventTextChannelJob>()
-                .AddScoped<ISuperSpecialLover, SuperSpecialLover>();
+                .AddScoped<ISuperSpecialLover, SuperSpecialLover>()
+                .AddScoped<ISlashCommandsConfig, SlashCommandsConfig>();
 
+            collection.AddClassesAsImplementedInterface(Assembly.GetExecutingAssembly(), typeof(ISlashCommandHandler<>));
+            
             return collection;
+        }
+
+        private static List<TypeInfo> GetTypesAssignableTo(this Assembly assembly, Type compareType)
+        {
+            var typeInfoList = assembly.DefinedTypes.Where(x => x.IsClass
+                                && !x.IsAbstract
+                                && x != compareType
+                                && x.GetInterfaces()
+                                        .Any(i => i.IsGenericType
+                                                && i.GetGenericTypeDefinition() == compareType))?.ToList();
+
+            return typeInfoList;
+        }
+
+        private static void AddClassesAsImplementedInterface(
+                this IServiceCollection services,
+                Assembly assembly,
+                Type compareType,
+                ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        {
+            assembly.GetTypesAssignableTo(compareType).ForEach((type) =>
+            {
+                foreach (var implementedInterface in type.ImplementedInterfaces)
+                {
+                    switch (lifetime)
+                    {
+                        case ServiceLifetime.Scoped:
+                            services.AddScoped(implementedInterface, type);
+                            break;
+                        case ServiceLifetime.Singleton:
+                            services.AddSingleton(implementedInterface, type);
+                            break;
+                        case ServiceLifetime.Transient:
+                            services.AddTransient(implementedInterface, type);
+                            break;
+                    }
+                }
+            });
         }
     }
 }

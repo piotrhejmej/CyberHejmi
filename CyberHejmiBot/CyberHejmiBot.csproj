@@ -29,10 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Business\SlashCommands\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="BotSettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
