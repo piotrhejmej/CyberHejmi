@@ -22,6 +22,27 @@ namespace CyberHejmiBot.Entities.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("CyberHejmiBot.Data.Entities.Wisdom.WisdomEntry", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AuthorName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WisdomEntries");
+                });
+
             modelBuilder.Entity("CyberHejmiBot.Entities.Test.TestEntity", b =>
                 {
                     b.Property<Guid>("Id")
@@ -38,7 +59,7 @@ namespace CyberHejmiBot.Entities.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TestEntities", (string)null);
+                    b.ToTable("TestEntities");
                 });
 #pragma warning restore 612, 618
         }

@@ -63,7 +63,7 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<ISuperSpecialLover, SuperSpecialLover>()
                 .AddScoped<ISlashCommandsConfig, SlashCommandsConfig>();
 
-            collection.AddClassesAsImplementedInterface(Assembly.GetExecutingAssembly(), typeof(ISlashCommandHandler<>));
+            collection.AddClassesAsImplementedInterface(Assembly.GetExecutingAssembly(), typeof(BaseSlashCommandHandler<ISlashCommand>));
             
             return collection;
         }
@@ -72,10 +72,8 @@ namespace CyberHejmiBot.Configuration.Startup
         {
             var typeInfoList = assembly.DefinedTypes.Where(x => x.IsClass
                                 && !x.IsAbstract
-                                && x != compareType
-                                && x.GetInterfaces()
-                                        .Any(i => i.IsGenericType
-                                                && i.GetGenericTypeDefinition() == compareType))?.ToList();
+                                && x.BaseType  == compareType)?.ToList();
+            var dupa = assembly.DefinedTypes.Where(p => p.BaseType == compareType).ToList();
 
             return typeInfoList;
         }
@@ -88,21 +86,18 @@ namespace CyberHejmiBot.Configuration.Startup
         {
             assembly.GetTypesAssignableTo(compareType).ForEach((type) =>
             {
-                foreach (var implementedInterface in type.ImplementedInterfaces)
-                {
                     switch (lifetime)
                     {
                         case ServiceLifetime.Scoped:
-                            services.AddScoped(implementedInterface, type);
+                            services.AddScoped(type.BaseType, type);
                             break;
                         case ServiceLifetime.Singleton:
-                            services.AddSingleton(implementedInterface, type);
+                            services.AddSingleton(type.BaseType, type);
                             break;
                         case ServiceLifetime.Transient:
-                            services.AddTransient(implementedInterface, type);
+                            services.AddTransient(type.BaseType, type);
                             break;
                     }
-                }
             });
         }
     }

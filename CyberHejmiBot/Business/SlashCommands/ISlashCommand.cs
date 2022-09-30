@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.SlashCommands
 {
-    internal interface ISlashCommand
+    public interface ISlashCommand
     {
     }
 }
