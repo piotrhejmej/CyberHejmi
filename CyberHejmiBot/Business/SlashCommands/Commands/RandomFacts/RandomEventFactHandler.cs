@@ -81,7 +81,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
             if (restChannel == null)
                 return false;
 
-            await restChannel.SendMessageAsync(embed: embedBuilder.Build());
+            await command.RespondAsync(embed: embedBuilder.Build());
 
             return true;
         }
