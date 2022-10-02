@@ -61,6 +61,13 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
             });
             await DbContext.SaveChangesAsync();
 
+            var embedBuilder = new EmbedBuilder()
+               .WithColor(Color.Teal)
+               .WithTitle("You have subscribed to daily facts!")
+               .WithDescription($"Every day on channel {channel.Name} at 9 am I will post a little fact on event that happened on the same day in the past :)");
+
+            await command.RespondAsync(embed: embedBuilder.Build());
+
             return true;
         }
 
