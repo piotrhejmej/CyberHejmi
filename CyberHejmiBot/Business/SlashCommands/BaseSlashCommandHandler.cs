@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.SlashCommands
 {
+    public record AdditionalOption(string OptionName, string Description, bool IsRequired, ApplicationCommandOptionType Type);
+
     public abstract class BaseSlashCommandHandler<T> where T: ISlashCommand
     {
         public abstract string CommandName { get; }
@@ -22,11 +24,29 @@ namespace CyberHejmiBot.Business.SlashCommands
             Logger = logger;
         }
 
-        public async Task Register()
+        public virtual async Task Register()
+        {
+            await Register(null);
+        }
+
+        public virtual async Task Register(ICollection<AdditionalOption> AdditionalOptions)
         {
             var commandBuilder = new SlashCommandBuilder()
                .WithName(CommandName)
                .WithDescription(Description);
+
+            if (AdditionalOptions?.Any() == true)
+            {
+                AdditionalOptions
+                    .ToList()
+                    .ForEach(option =>
+                    {
+                        commandBuilder.AddOption(option.OptionName, 
+                            option.Type,
+                            option.Description,
+                            option.IsRequired);
+                    });
+            }
 
             try
             {
@@ -39,10 +59,6 @@ namespace CyberHejmiBot.Business.SlashCommands
             }
         }
 
-        public virtual async Task DoWork(SocketSlashCommand command)
-        {
-            if (command?.Data.Name != CommandName)
-                return;
-        }
+        public virtual async Task<bool> DoWork(SocketSlashCommand command) => command?.Data.Name != CommandName;
     }
 }

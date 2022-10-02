@@ -1,4 +1,5 @@
 ﻿using CyberHejmiBot.Configuration.Settings;
+using CyberHejmiBot.Data.Entities.Facts;
 using CyberHejmiBot.Data.Entities.Wisdom;
 using CyberHejmiBot.Entities.Test;
 using Microsoft.EntityFrameworkCore;
@@ -15,8 +16,10 @@ namespace CyberHejmiBot.Entities
 {
     public class LocalDbContext : DbContext
     {
+        
         public DbSet<TestEntity> TestEntities => Set<TestEntity>();
         public DbSet<WisdomEntry> WisdomEntries => Set<WisdomEntry>();
+        public DbSet<FactsSubscription> FactsSubscriptions => Set<FactsSubscription>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

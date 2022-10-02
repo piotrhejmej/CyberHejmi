@@ -16,6 +16,8 @@ using CyberHejmiBot.Business.Jobs;
 using CyberHejmiBot.Business.SuperSpecial;
 using System.Reflection;
 using CyberHejmiBot.Business.SlashCommands;
+using CyberHejmiBot.Business.Common;
+using CyberHejmiBot.Business.Jobs.Recurring;
 
 namespace CyberHejmiBot.Configuration.Startup
 {
@@ -61,9 +63,12 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<IStartup, Startup>()
                 .AddScoped<IRemoveEventTextChannelJob, RemoveEventTextChannelJob>()
                 .AddScoped<ISuperSpecialLover, SuperSpecialLover>()
-                .AddScoped<ISlashCommandsConfig, SlashCommandsConfig>();
+                .AddScoped<ISlashCommandsConfig, SlashCommandsConfig>()
+                .AddScoped<IRandomFactFetcher, RandomFactFetcher>()
+                .AddScoped<IRecurringJobsConfig, RecurringJobsConfig>();
 
-            collection.AddClassesAsImplementedInterface(Assembly.GetExecutingAssembly(), typeof(BaseSlashCommandHandler<ISlashCommand>));
+            collection.AddClassesAsImplementedAbstractClass(Assembly.GetExecutingAssembly(), typeof(BaseSlashCommandHandler<ISlashCommand>));
+            collection.AddClassesAsImplementedInterface(Assembly.GetExecutingAssembly(), typeof(IReccurringJob));
             
             return collection;
         }
@@ -78,7 +83,7 @@ namespace CyberHejmiBot.Configuration.Startup
             return typeInfoList;
         }
 
-        private static void AddClassesAsImplementedInterface(
+        private static void AddClassesAsImplementedAbstractClass(
                 this IServiceCollection services,
                 Assembly assembly,
                 Type compareType,
@@ -98,6 +103,43 @@ namespace CyberHejmiBot.Configuration.Startup
                             services.AddTransient(type.BaseType, type);
                             break;
                     }
+            });
+        }
+
+        private static List<TypeInfo> GetTypesAssignableToInterface(this Assembly assembly, Type compareType)
+        {
+            var typeInfoList = assembly.DefinedTypes.Where(x => x.IsClass
+                                && !x.IsAbstract
+                                && x.ImplementedInterfaces.Any(i => i == compareType))
+                .ToList();
+
+            return typeInfoList;
+        }
+
+        private static void AddClassesAsImplementedInterface(
+                this IServiceCollection services,
+                Assembly assembly,
+                Type compareType,
+                ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        {
+            assembly.GetTypesAssignableToInterface(compareType).ForEach((type) =>
+            {
+                foreach (var implementedInterface in type.ImplementedInterfaces)
+                {
+                    switch (lifetime)
+                    {
+                        case ServiceLifetime.Scoped:
+                            services.AddScoped(implementedInterface, type);
+                            services.AddScoped(type);
+                            break;
+                        case ServiceLifetime.Singleton:
+                            services.AddSingleton(implementedInterface, type);
+                            break;
+                        case ServiceLifetime.Transient:
+                            services.AddTransient(implementedInterface, type);
+                            break;
+                    }
+                }
             });
         }
     }

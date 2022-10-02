@@ -24,9 +24,10 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             DbContext = dbContext;
         }
 
-        public override async Task DoWork(SocketSlashCommand command)
+        public override async Task<bool> DoWork(SocketSlashCommand command)
         {
-            await base.DoWork(command);
+            if ((await base.DoWork(command)))
+                return false;
 
             var rnd = new Random();
             var widomIds = await DbContext.WisdomEntries.Select(r => r.Id).ToArrayAsync();
@@ -40,6 +41,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                 .WithDescription(wisdom.Text);
 
             await command.RespondAsync(embed: embedBuilder.Build());
+            return true;
         }
     }
 }

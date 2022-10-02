@@ -37,7 +37,7 @@ public class TextCommandHandler
             await SuperSpecialLover.SendLove(messageParam);
 
         int argPos = 0;
-        var hehe = message.HasCharPrefix('!', ref argPos);
+
         if (!(message.HasCharPrefix('!', ref argPos) ||
             message.HasMentionPrefix(Client.CurrentUser, ref argPos)) ||
             message.Author.IsBot)

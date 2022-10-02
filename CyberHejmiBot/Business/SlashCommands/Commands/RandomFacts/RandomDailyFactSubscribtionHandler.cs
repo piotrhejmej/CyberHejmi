@@ -1,0 +1,68 @@
+﻿using CyberHejmiBot.Configuration.Loging;
+using CyberHejmiBot.Data.Entities.Facts;
+using CyberHejmiBot.Entities;
+using Discord;
+using Discord.WebSocket;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
+{
+    public class RandomDailyFactSubscribtionHandler : BaseSlashCommandHandler<ISlashCommand>
+    {
+        public override string CommandName => "subscribe-random-fact";
+
+        public override string Description => "Subscribes to daily random fact on selected channel";
+
+        private readonly ICollection<AdditionalOption> AdditionalOptions = new List<AdditionalOption>()
+        {
+            new AdditionalOption("channel", "Channel where random facts will be sent daily", true, ApplicationCommandOptionType.Channel)
+        };
+        private readonly LocalDbContext DbContext;
+
+        public RandomDailyFactSubscribtionHandler(DiscordSocketClient client, ILogger logger, LocalDbContext dbContext) : base(client, logger)
+        {
+            Client = client;
+            Logger = logger;
+            DbContext = dbContext;
+        }
+        public override Task Register()
+        {
+            return base.Register(this.AdditionalOptions);
+        }
+
+        public override async Task<bool> DoWork(SocketSlashCommand command)
+        {
+            if ((await base.DoWork(command)))
+                return false;
+
+            var channel = (SocketGuildChannel)command.Data.Options.FirstOrDefault(r => r.Name == "channel")?.Value;
+
+            if (channel is null)
+            {
+                await command.RespondAsync("Wrong channel");
+                return false;
+            }
+
+            var existingEntry = DbContext
+                .FactsSubscriptions
+                .FirstOrDefault(r => r.GuildId == channel.Guild.Id);
+
+            if (existingEntry is not null)
+                DbContext.Remove(existingEntry);
+
+            await DbContext.AddAsync(new FactsSubscription()
+            {
+                ChannelId = channel.Id,
+                GuildId = channel.Guild.Id
+            });
+            await DbContext.SaveChangesAsync();
+
+            return true;
+        }
+
+    }
+}
