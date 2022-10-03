@@ -27,7 +27,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         public void AddOrUpdate()
         {
-            RecurringJob.AddOrUpdate<RandomFactProviderJob>(x => x.DoWork(), Cron.Daily(10));
+            RecurringJob.AddOrUpdate<RandomFactProviderJob>(x => x.DoWork(), Cron.Daily(7));
         }
 
         public async Task DoWork()
