@@ -3,6 +3,7 @@ using System;
 using CyberHejmiBot.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CyberHejmiBot.Entities.Migrations
 {
     [DbContext(typeof(LocalDbContext))]
-    partial class LocalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221021191025_AddBirthdayMigration")]
+    partial class AddBirthdayMigration
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,7 +47,7 @@ namespace CyberHejmiBot.Entities.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Birthdays", (string)null);
+                    b.ToTable("Birthdays");
                 });
 
             modelBuilder.Entity("CyberHejmiBot.Data.Entities.Facts.FactsSubscription", b =>
@@ -64,7 +66,7 @@ namespace CyberHejmiBot.Entities.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FactsSubscriptions", (string)null);
+                    b.ToTable("FactsSubscriptions");
                 });
 
             modelBuilder.Entity("CyberHejmiBot.Data.Entities.Wisdom.WisdomEntry", b =>
@@ -85,7 +87,7 @@ namespace CyberHejmiBot.Entities.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("WisdomEntries", (string)null);
+                    b.ToTable("WisdomEntries");
                 });
 
             modelBuilder.Entity("CyberHejmiBot.Entities.Test.TestEntity", b =>
@@ -104,7 +106,7 @@ namespace CyberHejmiBot.Entities.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TestEntities", (string)null);
+                    b.ToTable("TestEntities");
                 });
 #pragma warning restore 612, 618
         }

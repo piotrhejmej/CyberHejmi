@@ -1,4 +1,6 @@
 ﻿using CyberHejmiBot.Business.Common;
+using CyberHejmiBot.Data.Entities.Birthdays;
+using CyberHejmiBot.Data.Entities.Facts;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.Rest;
@@ -38,6 +40,9 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
             foreach (var subscription in subscriptions)
             {
+                if (await BirthdayOverride(subscription))
+                    continue;
+
                 var randomFactOfADay = await RandomFactFetcher
                     .GetRandomFactOfToday(FactType.Event);
 
@@ -55,6 +60,37 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
                 await restChannel.SendMessageAsync(embed: embedBuilder.Build());
             }
+        }
+
+        public async Task<bool> BirthdayOverride(FactsSubscription subscription)
+        {
+            //TODO Add wishes
+            var today = DateTime.UtcNow;
+
+            var jubilees = DbContext
+                .Birthdays
+                .Where(b => b.GuildId == subscription.GuildId)
+                .Where(r => r.Date.Month == today.Month && r.Date.Day == today.Day)
+                .ToList();
+           
+            if (jubilees.Any())
+            {
+                var restChannel = await Client
+                        .Rest
+                        .GetChannelAsync(subscription.ChannelId) as RestTextChannel;
+
+                if (restChannel == null)
+                    return false;
+
+                var embedBuilder = new EmbedBuilder()
+                    .WithColor(Color.Blue)
+                    .WithTitle($"On this day in {String.Join(" and ", jubilees.Select(r => r.Date.Year))}:")
+                    .WithDescription("");
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

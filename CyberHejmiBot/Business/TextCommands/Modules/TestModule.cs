@@ -32,12 +32,14 @@ namespace CyberHejmiBot.Modules
 		[Summary("Gets from Db")]
 		public async Task GetAsync()
         {
-			var test = Context.TestEntities.FirstOrDefault();
+			var datetime = new DateTime(2022, 1, 7);
 
-			if (test is null)
+			var typek = Context.Birthdays.FirstOrDefault(r => r.Date.Month == datetime.Month && r.Date.Day == datetime.Day);
+
+			if (typek is null)
 				return;
 
-			await ReplyAsync($"from db: {test.Id} {test.Name} {test.Description}");
+			await ReplyAsync($"typek {typek.Name}, urodzon {typek.Date.ToShortTimeString()}, custom txt {typek.CustomDescription}");
 		}
 	}
 }

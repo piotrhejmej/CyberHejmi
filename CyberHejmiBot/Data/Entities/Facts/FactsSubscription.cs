@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Data.Entities.Facts
 {
-    public class FactsSubscription
+    public record FactsSubscription
     {
         public int Id { get; set; }
         public ulong ChannelId { get; set; }

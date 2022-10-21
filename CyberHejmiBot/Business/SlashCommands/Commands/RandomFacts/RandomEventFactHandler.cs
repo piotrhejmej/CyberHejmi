@@ -74,13 +74,6 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
                 .WithTitle(isToday ? $"On this day in {result.Year}:" : $"On {usedDate.ToString("MMMM dd")} {result.Year}:")
                 .WithDescription(result.Description);
 
-            var restChannel = (await Client
-                .Rest
-                .GetChannelAsync(command.ChannelId ?? 0)) as RestTextChannel;
-
-            if (restChannel == null)
-                return false;
-
             await command.RespondAsync(embed: embedBuilder.Build());
 
             return true;

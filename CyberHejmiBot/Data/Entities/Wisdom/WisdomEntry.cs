@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Data.Entities.Wisdom
 {
-    public class WisdomEntry
+    public record WisdomEntry
     {
         public int Id { get; set; }
         public string AuthorName { get; set; }
