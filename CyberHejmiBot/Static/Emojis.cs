@@ -8,8 +8,7 @@ namespace CyberHejmiBot.Static
 {
     public static class Emojis
     {
-        public static string[] UnicodeArray =
-        {
+        private static readonly string[] Emotes = {
             "\U0001F600",
             "\U0001F603",
             "\U0001F604",
@@ -163,5 +162,7 @@ namespace CyberHejmiBot.Static
             "\U0001F4A4",
             "\U0001F44B",
         };
+
+        public static string[] UnicodeArray => Emotes;
     }
 }

@@ -64,8 +64,7 @@ namespace CyberHejmiBot.Business.SuperSpecial
 
         private async Task LogMesage(SocketMessage messageParam)
         {
-            var message = messageParam as SocketUserMessage;
-            if (message == null) return;
+            if (messageParam is not SocketUserMessage message) return;
 
             int argPos = 0;
             if ((message.HasCharPrefix('!', ref argPos) ||

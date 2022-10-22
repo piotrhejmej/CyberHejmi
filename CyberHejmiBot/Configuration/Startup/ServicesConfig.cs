@@ -18,6 +18,7 @@ using System.Reflection;
 using CyberHejmiBot.Business.SlashCommands;
 using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Business.Jobs.Recurring;
+using CyberHejmiBot.Business.TextCommands;
 
 namespace CyberHejmiBot.Configuration.Startup
 {

@@ -28,7 +28,7 @@ namespace CyberHejmiBot.Entities
             var connectionString = Environment.GetEnvironmentVariable("Db_ConnectionString");
 
             if (connectionString == null)
-                throw new ArgumentException();
+                throw new ArgumentException("DB connection string is missing");
 
             optionsBuilder.UseNpgsql(connectionString);
         }

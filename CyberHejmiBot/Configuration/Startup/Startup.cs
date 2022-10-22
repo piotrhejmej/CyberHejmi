@@ -1,5 +1,6 @@
 ﻿using CyberHejmiBot.Business.Events;
 using CyberHejmiBot.Business.SlashCommands;
+using CyberHejmiBot.Business.TextCommands;
 using CyberHejmiBot.Configuration.Loging;
 using CyberHejmiBot.Configuration.Settings;
 using Discord;
@@ -22,21 +23,18 @@ namespace CyberHejmiBot.Configuration.Startup
         private readonly DiscordSocketClient Client;
         private readonly TextCommandHandler CommandHandler;
         private readonly ILogger Logger;
-        private readonly BotSettings BotSettings;
         private readonly IEventListener EventListener;
         private readonly ISlashCommandsConfig SlashCommandsConfig;
 
         public Startup(DiscordSocketClient client,
                        TextCommandHandler commandHandler,
                        ILogger logger,
-                       BotSettings botSettings,
                        IEventListener eventListener,
                        ISlashCommandsConfig slashCommandsConfig)
         {
             Client = client;
             CommandHandler = commandHandler;
             Logger = logger;
-            BotSettings = botSettings;
             EventListener = eventListener;
             SlashCommandsConfig = slashCommandsConfig;
         }

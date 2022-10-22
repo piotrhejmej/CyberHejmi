@@ -5,49 +5,51 @@ using Discord.WebSocket;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-public class TextCommandHandler
+namespace CyberHejmiBot.Business.TextCommands
 {
-    private readonly DiscordSocketClient Client;
-    private readonly CommandService Commands;
-    private readonly IServiceProvider ServiceProvider;
-    private readonly ISuperSpecialLover SuperSpecialLover;
-
-    public TextCommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider serviceProvider, ISuperSpecialLover superSpecialLover)
+    public class TextCommandHandler
     {
-        Client = client;
-        Commands = commands;
-        ServiceProvider = serviceProvider;
-        SuperSpecialLover = superSpecialLover;
-    }
+        private readonly DiscordSocketClient Client;
+        private readonly CommandService Commands;
+        private readonly IServiceProvider ServiceProvider;
+        private readonly ISuperSpecialLover SuperSpecialLover;
 
-    public async Task InstallCommandsAsync()
-    {
-        Client.MessageReceived += HandleCommandAsync;
+        public TextCommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider serviceProvider, ISuperSpecialLover superSpecialLover)
+        {
+            Client = client;
+            Commands = commands;
+            ServiceProvider = serviceProvider;
+            SuperSpecialLover = superSpecialLover;
+        }
 
-        await Commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
-                                        services: ServiceProvider);
-    }
+        public async Task InstallCommandsAsync()
+        {
+            Client.MessageReceived += HandleCommandAsync;
 
-    private async Task HandleCommandAsync(SocketMessage messageParam)
-    {
-        var message = messageParam as SocketUserMessage;
-        if (message == null) return;
+            await Commands.AddModulesAsync(assembly: Assembly.GetEntryAssembly(),
+                                            services: ServiceProvider);
+        }
 
-        if (messageParam.Author.Username == Environment.GetEnvironmentVariable("SUPER_SECRET"))
-            await SuperSpecialLover.SendLove(messageParam);
+        private async Task HandleCommandAsync(SocketMessage messageParam)
+        {
+            if (messageParam is not SocketUserMessage message) return;
 
-        int argPos = 0;
+            if (messageParam.Author.Username == Environment.GetEnvironmentVariable("SUPER_SECRET"))
+                await SuperSpecialLover.SendLove(messageParam);
 
-        if (!(message.HasCharPrefix('!', ref argPos) ||
-            message.HasMentionPrefix(Client.CurrentUser, ref argPos)) ||
-            message.Author.IsBot)
-            return;
+            int argPos = 0;
 
-        var context = new SocketCommandContext(Client, message);
+            if (!(message.HasCharPrefix('!', ref argPos) ||
+                message.HasMentionPrefix(Client.CurrentUser, ref argPos)) ||
+                message.Author.IsBot)
+                return;
 
-        await Commands.ExecuteAsync(
-            context: context,
-            argPos: argPos,
-            services: ServiceProvider);
+            var context = new SocketCommandContext(Client, message);
+
+            await Commands.ExecuteAsync(
+                context: context,
+                argPos: argPos,
+                services: ServiceProvider);
+        }
     }
 }
