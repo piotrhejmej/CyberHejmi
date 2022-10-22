@@ -64,7 +64,6 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         public async Task<bool> BirthdayOverride(FactsSubscription subscription)
         {
-            //TODO Add wishes
             var today = DateTime.UtcNow;
 
             var jubilees = DbContext
@@ -82,10 +81,21 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 if (restChannel == null)
                     return false;
 
+                var description = $"**{String.Join(" i ", jubilees.Select(r => $"{r.Name} obchodzi {today.Year - r.Date.Year}"))} urodziny!** z tej okazji życzymy:\nStooo lat, stooo lat, niech żyje cumpel nam! \nI jeszcze jeden i jeszcze raz!\nPrzez ręce Maaaaaryiiiiii\nSto lat, sto lat, sto lat, sto lat niech żyje nam\n A KTO??";
+
+                description = jubilees.Any(r => r.HasCusomDescription) ?
+                    jubilees.First(r => r.HasCusomDescription).CustomDescription :
+                    description;
+
                 var embedBuilder = new EmbedBuilder()
-                    .WithColor(Color.Blue)
+                {
+                    ImageUrl = "https://media.tenor.com/dM2Tdvd4gsEAAAAC/wszystkiego-najlepszego.gif"
+                }
+                    .WithColor(Color.Gold)
                     .WithTitle($"On this day in {String.Join(" and ", jubilees.Select(r => r.Date.Year))}:")
-                    .WithDescription("");
+                    .WithDescription(description);
+
+                await restChannel.SendMessageAsync(embed: embedBuilder.Build());
 
                 return true;
             }

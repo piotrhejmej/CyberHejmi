@@ -35,7 +35,7 @@ public class Program
 
                 dbContext.Database.Migrate();
                 dbContext.Seed();
-                
+
                 var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
                 recurringJobsConfig.RegisterJobs();
 

@@ -1,4 +1,5 @@
-﻿using CyberHejmiBot.Configuration.Hangfire;
+﻿using CyberHejmiBot.Business.Jobs.Recurring;
+using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Configuration.Loging;
 using CyberHejmiBot.Entities;
 using Discord;
@@ -18,7 +19,7 @@ namespace CyberHejmiBot.Modules
 	{
 		private readonly LocalDbContext Context;
 
-		public TestModule(LocalDbContext context) : base()
+		public TestModule(LocalDbContext context, RandomFactProviderJob job) : base()
         {
             Context = context;
         }
