@@ -89,7 +89,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
                 var embedBuilder = new EmbedBuilder()
                 {
-                    ImageUrl = "https://media.tenor.com/dM2Tdvd4gsEAAAAC/wszystkiego-najlepszego.gif"
+                    ImageUrl = jubilees.Any(r => r.HasCusomDescription) ? null : "https://media.tenor.com/dM2Tdvd4gsEAAAAC/wszystkiego-najlepszego.gif"
                 }
                     .WithColor(Color.Gold)
                     .WithTitle($"On this day in {String.Join(" and ", jubilees.Select(r => r.Date.Year))}:")

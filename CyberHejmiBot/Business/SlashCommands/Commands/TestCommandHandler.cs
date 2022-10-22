@@ -24,6 +24,9 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
         public override async Task<bool> DoWork(SocketSlashCommand command)
         {
+            if ((await base.DoWork(command)))
+                return false;
+
             await RandomFactProviderJob.BirthdayOverride(new Data.Entities.Facts.FactsSubscription()
             {
                 GuildId = command.GuildId.Value,

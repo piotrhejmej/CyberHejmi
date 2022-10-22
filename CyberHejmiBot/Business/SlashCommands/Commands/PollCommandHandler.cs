@@ -15,13 +15,16 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
         {
         }
 
-        public override string CommandName => "test";
+        public override string CommandName => "poll";
 
-        public override string Description => "ttest";
+        public override string Description => "not working yet";
 
-        public Task DoWork()
+        public override async Task<bool> DoWork(SocketSlashCommand command)
         {
-            return Task.CompletedTask;
+            if ((await base.DoWork(command)))
+                return false;
+
+            return false;
         }
     }
 }
