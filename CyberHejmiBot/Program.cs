@@ -12,15 +12,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-public class Program
+namespace CyberHejmiBot
 {
-    static void Main(string[] args)
-        => new Program().RunAsync(args).GetAwaiter().GetResult();
-
-    public async Task RunAsync(string[] args)
+    public class Program
     {
-        using (var services = ServicesConfig.CreateProvider())
+        static void Main()
+            => Program.RunAsync().GetAwaiter().GetResult();
+
+        public static async Task RunAsync()
         {
+            using var services = ServicesConfig.CreateProvider();
+
             GlobalConfiguration.Configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseColouredConsoleLogProvider()
@@ -29,21 +31,20 @@ public class Program
                 .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
                 .UseActivator(new HangfireJobActivator(services));
 
-            using (var server = new BackgroundJobServer())
-            {
-                var dbContext = services.GetRequiredService<LocalDbContext>();
+            using var server = new BackgroundJobServer();
 
-                dbContext.Database.Migrate();
-                dbContext.Seed();
+            var dbContext = services.GetRequiredService<LocalDbContext>();
 
-                var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
-                recurringJobsConfig.RegisterJobs();
+            dbContext.Database.Migrate();
+            dbContext.Seed();
 
-                var startup = services.GetRequiredService<IStartup>();
-                await startup.Init();
+            var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
+            recurringJobsConfig.RegisterJobs();
 
-                await Task.Delay(-1);
-            }
+            var startup = services.GetRequiredService<IStartup>();
+            await startup.Init();
+
+            await Task.Delay(-1);
         }
     }
 }

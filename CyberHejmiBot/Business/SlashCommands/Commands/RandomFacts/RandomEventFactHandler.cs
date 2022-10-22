@@ -71,7 +71,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
 
             var embedBuilder = new EmbedBuilder()
                 .WithColor(Color.Blue)
-                .WithTitle(isToday ? $"On this day in {result.Year}:" : $"On {usedDate.ToString("MMMM dd")} {result.Year}:")
+                .WithTitle(isToday ? $"On this day in {result.Year}:" : $"On {usedDate:MMMM dd} {result.Year}:")
                 .WithDescription(result.Description);
 
             await command.RespondAsync(embed: embedBuilder.Build());

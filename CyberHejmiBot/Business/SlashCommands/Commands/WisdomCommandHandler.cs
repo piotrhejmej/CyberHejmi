@@ -35,6 +35,9 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
             var wisdom = DbContext.WisdomEntries.FirstOrDefault(r => r.Id == wisdomIndex);
 
+            if (wisdom is null)
+                return false;
+
             var embedBuilder = new EmbedBuilder()
                 .WithTitle($"Like wise {wisdom.AuthorName} once said:")
                 .WithColor(Color.Green)

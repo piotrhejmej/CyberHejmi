@@ -11,12 +11,10 @@ namespace CyberHejmiBot.Business.SlashCommands
 
     internal class SlashCommandsConfig: ISlashCommandsConfig
     {
-        private readonly IServiceProvider ServiceProvider;
         private readonly IEnumerable<BaseSlashCommandHandler<ISlashCommand>> Things;
 
-        public SlashCommandsConfig(IServiceProvider serviceProvider, IEnumerable<BaseSlashCommandHandler<ISlashCommand>> things)
+        public SlashCommandsConfig(IEnumerable<BaseSlashCommandHandler<ISlashCommand>> things)
         {
-            ServiceProvider = serviceProvider;
             Things = things;
         }
 

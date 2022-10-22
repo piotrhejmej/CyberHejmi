@@ -39,7 +39,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
             if ((await base.DoWork(command)))
                 return false;
 
-            var channel = (SocketGuildChannel)command.Data.Options.FirstOrDefault(r => r.Name == "channel")?.Value;
+            var channel = (SocketGuildChannel?)command.Data.Options.FirstOrDefault(r => r.Name == "channel")?.Value;
 
             if (channel is null)
             {

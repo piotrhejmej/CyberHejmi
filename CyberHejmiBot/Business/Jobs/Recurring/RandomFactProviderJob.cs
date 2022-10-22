@@ -46,11 +46,9 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 var randomFactOfADay = await RandomFactFetcher
                     .GetRandomFactOfToday(FactType.Event);
 
-                var restChannel = (await Client
+                if ((await Client
                    .Rest
-                   .GetChannelAsync(subscription.ChannelId)) as RestTextChannel;
-
-                if (restChannel == null)
+                   .GetChannelAsync(subscription.ChannelId)) is not RestTextChannel restChannel)
                     continue;
 
                 var embedBuilder = new EmbedBuilder()
@@ -74,11 +72,9 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
            
             if (jubilees.Any())
             {
-                var restChannel = await Client
+                if (await Client
                         .Rest
-                        .GetChannelAsync(subscription.ChannelId) as RestTextChannel;
-
-                if (restChannel == null)
+                        .GetChannelAsync(subscription.ChannelId) is not RestTextChannel restChannel)
                     return false;
 
                 var description = $"**{String.Join(" i ", jubilees.Select(r => $"{r.Name} obchodzi {today.Year - r.Date.Year}"))} urodziny!** z tej okazji życzymy:\nStooo lat, stooo lat, niech żyje cumpel nam! \nI jeszcze jeden i jeszcze raz!\nPrzez ręce Maaaaaryiiiiii\nSto lat, sto lat, sto lat, sto lat niech żyje nam\n A KTO??";

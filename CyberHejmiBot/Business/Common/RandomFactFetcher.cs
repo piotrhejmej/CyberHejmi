@@ -43,12 +43,12 @@ namespace CyberHejmiBot.Business.Common
             return new RandomFactResult()
             {
                 FactType = FactType,
-                Description = randomWikiFact.Description,
-                Year = randomWikiFact.Year
+                Description = randomWikiFact?.Description,
+                Year = randomWikiFact?.Year
             };
         }
 
-        private async Task<WikiEventEntry> GetFact(DateTime date, FactType FactType)
+        private async Task<WikiEventEntry?> GetFact(DateTime date, FactType FactType)
         {
             try
             {
@@ -70,15 +70,15 @@ namespace CyberHejmiBot.Business.Common
 
                 var random = new Random();
 
-                return resultCollection.ToArray()[random.Next(resultCollection.Count)];
+                return resultCollection?.ToArray()[random.Next(resultCollection.Count)];
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return null;
             }
         }
 
-        private string GetUriTypeSegment(FactType type) => type switch
+        private static string GetUriTypeSegment(FactType type) => type switch
         {
             FactType.Event => "events.json",
             FactType.Births => "births.json",

@@ -17,9 +17,9 @@ namespace CyberHejmiBot.Modules
 	[Group("test")]
 	public class TestModule : ModuleBase<SocketCommandContext>
 	{
-		private readonly LocalDbContext Context;
+		private new readonly LocalDbContext Context;
 
-		public TestModule(LocalDbContext context, RandomFactProviderJob job) : base()
+		public TestModule(LocalDbContext context) : base()
         {
             Context = context;
         }

@@ -27,6 +27,9 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             if ((await base.DoWork(command)))
                 return false;
 
+            if (command.GuildId is null || command.ChannelId is null)
+                return false;
+
             await RandomFactProviderJob.BirthdayOverride(new Data.Entities.Facts.FactsSubscription()
             {
                 GuildId = command.GuildId.Value,

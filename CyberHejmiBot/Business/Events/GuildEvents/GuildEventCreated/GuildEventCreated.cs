@@ -12,13 +12,13 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.Events.GuildEvents.GuildEventCreatedScope
 {
-    internal record GuildEventCreated(SocketGuildEvent guildEvent) : IRequest<Unit>;
+    internal record GuildEventCreated(SocketGuildEvent GuildEvent) : IRequest<Unit>;
 
     internal class GuildEventCreatedHandler : IRequestHandler<GuildEventCreated, Unit>
     {
         public async Task<Unit> Handle(GuildEventCreated request, CancellationToken cancellationToken)
         {
-            var guild = request.guildEvent.Guild;
+            var guild = request.GuildEvent.Guild;
 
             ICategoryChannel? eventsChannel;
 
@@ -35,13 +35,13 @@ namespace CyberHejmiBot.Business.Events.GuildEvents.GuildEventCreatedScope
             if (eventsChannel is null)
                 return Unit.Value;
 
-            var textChannel = await guild.CreateTextChannelAsync(request.guildEvent.Name, opt =>
+            var textChannel = await guild.CreateTextChannelAsync(request.GuildEvent.Name, opt =>
             {
                 opt.CategoryId = eventsChannel.Id;
-                opt.Topic = request.guildEvent.Description ?? "";
+                opt.Topic = request.GuildEvent.Description ?? "";
             });
 
-            await textChannel.SendMessageAsync($"Welcome to {request.guildEvent.Name}, a channel created for event!");
+            await textChannel.SendMessageAsync($"Welcome to {request.GuildEvent.Name}, a channel created for event!");
 
             return Unit.Value;
         }

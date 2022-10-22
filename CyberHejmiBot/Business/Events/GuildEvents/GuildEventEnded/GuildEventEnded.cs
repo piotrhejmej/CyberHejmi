@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.Events.GuildEvents.GuildEventEndedScope
 {
-    public record GuildEventEndedCommand(SocketGuildEvent guildEvent) : IRequest<Unit>;
+    public record GuildEventEndedCommand(SocketGuildEvent GuildEvent) : IRequest<Unit>;
 
     public class GuildEventEndedHandler : IRequestHandler<GuildEventEndedCommand, Unit>
     {
@@ -26,23 +26,21 @@ namespace CyberHejmiBot.Business.Events.GuildEvents.GuildEventEndedScope
 
         public async Task<Unit> Handle(GuildEventEndedCommand request, CancellationToken cancellationToken)
         {
-            var guild = request.guildEvent.Guild;
-            var textChannel = guild.Channels.FirstOrDefault(ch => ch.Name.Replace('-', ' ').Equals(request.guildEvent.Name, StringComparison.OrdinalIgnoreCase));
+            var guild = request.GuildEvent.Guild;
+            var textChannel = guild.Channels.FirstOrDefault(ch => ch.Name.Replace('-', ' ').Equals(request.GuildEvent.Name, StringComparison.OrdinalIgnoreCase));
 
             if (textChannel == null)
                 return Unit.Value;
 
-            var restChannel = (await Client
+            if ((await Client
                 .Rest
-                .GetChannelAsync(textChannel.Id)) as RestTextChannel;
-
-            if (restChannel == null)
+                .GetChannelAsync(textChannel.Id)) is not RestTextChannel restChannel)
                 return Unit.Value;
 
             var embedBuilder = new EmbedBuilder()
                 .WithColor(Color.Red)
                 .WithTitle("All good thing once ends...")
-                .WithDescription($"{request.guildEvent.Name} ended.\nChannel will be up and running for another Day\nGather memories, backup your photos and see you next time!");
+                .WithDescription($"{request.GuildEvent.Name} ended.\nChannel will be up and running for another Day\nGather memories, backup your photos and see you next time!");
 
             await restChannel.SendMessageAsync(embed: embedBuilder.Build());
 

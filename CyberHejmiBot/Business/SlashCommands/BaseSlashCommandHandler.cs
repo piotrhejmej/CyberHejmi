@@ -29,7 +29,7 @@ namespace CyberHejmiBot.Business.SlashCommands
             await Register(null);
         }
 
-        public virtual async Task Register(ICollection<AdditionalOption> AdditionalOptions)
+        public virtual async Task Register(ICollection<AdditionalOption>? AdditionalOptions)
         {
             var commandBuilder = new SlashCommandBuilder()
                .WithName(CommandName)
@@ -55,10 +55,10 @@ namespace CyberHejmiBot.Business.SlashCommands
             }
             catch (Exception ex)
             {
-                Logger.Log(new LogMessage(LogSeverity.Error, ex.Source, ex.Message, ex));
+                await Logger.Log(new LogMessage(LogSeverity.Error, ex.Source, ex.Message, ex));
             }
         }
 
-        public virtual async Task<bool> DoWork(SocketSlashCommand command) => command?.Data.Name != CommandName;
+        public virtual Task<bool> DoWork(SocketSlashCommand command) => Task.FromResult(command?.Data.Name != CommandName);
     }
 }

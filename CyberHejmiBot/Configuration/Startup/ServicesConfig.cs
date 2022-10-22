@@ -73,7 +73,7 @@ namespace CyberHejmiBot.Configuration.Startup
             return collection;
         }
 
-        private static List<TypeInfo> GetTypesAssignableTo(this Assembly assembly, Type compareType)
+        private static List<TypeInfo>? GetTypesAssignableTo(this Assembly assembly, Type compareType)
         {
             var typeInfoList = assembly.DefinedTypes.Where(x => x.IsClass
                                 && !x.IsAbstract
@@ -89,20 +89,23 @@ namespace CyberHejmiBot.Configuration.Startup
                 Type compareType,
                 ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
-            assembly.GetTypesAssignableTo(compareType).ForEach((type) =>
+            assembly.GetTypesAssignableTo(compareType)?.ForEach((type) =>
             {
-                    switch (lifetime)
-                    {
-                        case ServiceLifetime.Scoped:
-                            services.AddScoped(type.BaseType, type);
-                            break;
-                        case ServiceLifetime.Singleton:
-                            services.AddSingleton(type.BaseType, type);
-                            break;
-                        case ServiceLifetime.Transient:
-                            services.AddTransient(type.BaseType, type);
-                            break;
-                    }
+                if (type.BaseType is null)
+                    return;
+
+                switch (lifetime)
+                {
+                    case ServiceLifetime.Scoped:
+                        services.AddScoped(type.BaseType, type);
+                        break;
+                    case ServiceLifetime.Singleton:
+                        services.AddSingleton(type.BaseType, type);
+                        break;
+                    case ServiceLifetime.Transient:
+                        services.AddTransient(type.BaseType, type);
+                        break;
+                }
             });
         }
 
