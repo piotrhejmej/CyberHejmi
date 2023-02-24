@@ -16,9 +16,13 @@ jobs:
         run: docker build -t my-dotnet-service:${{ github.sha }} .
 
       - name: Configure SSH
-        uses: webfactory/ssh-agent@v0.5.0
+        uses: shimataro/ssh-key-action@v2
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          known_hosts: 'placeholder'
+          
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy to CentOS server
         uses: appleboy/ssh-action@master
