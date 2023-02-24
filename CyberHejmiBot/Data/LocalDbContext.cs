@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 namespace CyberHejmiBot.Entities
 {
     public class LocalDbContext : DbContext
-    {
+    { 
         public DbSet<TestEntity> TestEntities => Set<TestEntity>();
         public DbSet<WisdomEntry> WisdomEntries => Set<WisdomEntry>();
         public DbSet<FactsSubscription> FactsSubscriptions => Set<FactsSubscription>();
