@@ -1,22 +1,32 @@
-name: Deploy to Heroku
+name: Deploy to CentOS Server
 
 on:
   push:
-    branches:
-      - master
+    branches: [ main ]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image
+        run: docker build -t my-dotnet-service:${{ github.sha }} .
+
+      - name: Configure SSH
+        uses: webfactory/ssh-agent@v0.5.0
         with:
-          heroku_api_key: ${{secrets.HEROKU_SECRET}}
-          heroku_app_name: ${{secrets.HEROKU_APP}}
-          heroku_email: ${{secrets.HEROKU_USERNAME}}
-          docker_heroku_process_type: "worker"
-          procfile: "worker dotnet run"
-          usedocker: true
-        env:
-          DISCORD_KEY: ${{secrets.DISCORD_TOKEN}}
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy to CentOS server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.CENTOS_SERVER }}
+          username: ${{ secrets.CENTOS_USERNAME }}
+          password: ${{ secrets.CENTOS_PASSWORD }}
+          script: |
+            docker stop my-dotnet-service || true
+            docker rm my-dotnet-service || true
+            docker run -d --name my-dotnet-service -p 8080:80 -e DISCORD_KEY=${{ secrets.DISCORD_TOKEN }} my-dotnet-service:${{ github.sha }}
