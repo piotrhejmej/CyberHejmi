@@ -15,11 +15,11 @@ jobs:
       - name: Build Docker image
         run: docker build -t my-dotnet-service:${{ github.sha }} .
 
-      - name: Configure SSH
-        uses: shimataro/ssh-key-action@v2
-        with:
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          known_hosts: 'placeholder'
+      # - name: Configure SSH
+      #   uses: shimataro/ssh-key-action@v2
+      #   with:
+      #     key: ${{ secrets.SSH_PRIVATE_KEY }}
+      #     known_hosts: 'placeholder'
 
       # - name: Adding Known Hosts
       #   run: ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
@@ -39,7 +39,7 @@ jobs:
         with:
           host: ${{ secrets.CENTOS_SERVER }}
           username: ${{ secrets.CENTOS_USERNAME }}
-          password: ${{ secrets.CENTOS_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             docker stop my-dotnet-service || true
             docker rm my-dotnet-service || true
