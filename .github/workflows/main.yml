@@ -29,8 +29,8 @@ jobs:
       - name: Copy Docker image to server and run
         uses: appleboy/scp-action@master
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
+          host: ${{ secrets.CENTOS_SERVER }}
+          username: ${{ secrets.CENTOS_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           passphrase: ${{ secrets.SSH_PASSPHRASE }}
           source: my-dotnet-service:${{ github.sha }}.tar.gz
