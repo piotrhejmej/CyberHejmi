@@ -1,15 +1,9 @@
-﻿using CyberHejmiBot.Configuration;
-using CyberHejmiBot.Configuration.Hangfire;
+﻿using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Configuration.Startup;
 using CyberHejmiBot.Entities;
-using Discord;
-using Discord.Commands;
-using Discord.Rest;
-using Discord.WebSocket;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CyberHejmiBot
@@ -27,19 +21,19 @@ namespace CyberHejmiBot
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseColouredConsoleLogProvider()
                 .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings();
-                //.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
-                //.UseActivator(new HangfireJobActivator(services));
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
+                .UseActivator(new HangfireJobActivator(services));
 
-            //using var server = new BackgroundJobServer();
+            using var server = new BackgroundJobServer();
 
-            //var dbContext = services.GetRequiredService<LocalDbContext>();
+            var dbContext = services.GetRequiredService<LocalDbContext>();
 
-            //dbContext.Database.Migrate();
-            //dbContext.Seed();
+            dbContext.Database.Migrate();
+            dbContext.Seed();
 
-            //var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
-            //recurringJobsConfig.RegisterJobs();
+            var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
+            recurringJobsConfig.RegisterJobs();
 
             var startup = services.GetRequiredService<IStartup>();
             await startup.Init();

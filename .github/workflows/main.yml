@@ -41,4 +41,4 @@ jobs:
             docker stop my-dotnet-service || true
             docker rm my-dotnet-service || true
             docker load -i my-dotnet-service:${{ github.sha }}.tar.gz
-            docker run -d --name my-dotnet-service -p 8080:80 -e BOT_TOKEN=${{ secrets.DISCORD_TOKEN }} my-dotnet-service:${{ github.sha }}
+            docker run -d --name my-dotnet-service -p 8080:80 -e BOT_TOKEN=${{ secrets.DISCORD_TOKEN }} -e Db_ConnectionString={{ secrets.DB_STRING }} my-dotnet-service:${{ github.sha }}
