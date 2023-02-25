@@ -24,7 +24,7 @@ jobs:
           username: ${{ secrets.CENTOS_USERNAME }}
           password: ${{ secrets.CENTOS_PASSWORD }}
           source: my-dotnet-service.tar.gz
-          target: /tmp
+          target: /home/phejmej
 
       #- name: RUN
       #  run: |
