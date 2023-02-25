@@ -41,6 +41,7 @@ namespace CyberHejmiBot.Configuration.Startup
 
         public async Task Init()
         {
+            Console.WriteLine(Environment.GetEnvironmentVariable("BOT_TOKEN"));
             await Client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BOT_TOKEN"));
             await Client.StartAsync();
             Client.Ready += Ready;
