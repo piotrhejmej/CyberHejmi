@@ -43,20 +43,20 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 if (await BirthdayOverride(subscription))
                     continue;
 
-                var randomFactOfADay = await RandomFactFetcher
-                    .GetRandomFactOfToday(FactType.Event);
+                //var randomFactOfADay = await RandomFactFetcher
+                //    .GetRandomFactOfToday(FactType.Event);
 
-                if ((await Client
-                   .Rest
-                   .GetChannelAsync(subscription.ChannelId)) is not RestTextChannel restChannel)
-                    continue;
+                //if ((await Client
+                //   .Rest
+                //   .GetChannelAsync(subscription.ChannelId)) is not RestTextChannel restChannel)
+                //    continue;
 
-                var embedBuilder = new EmbedBuilder()
-                    .WithColor(Color.Blue)
-                    .WithTitle($"Random fact for Today! On this day in {randomFactOfADay.Year}:")
-                    .WithDescription(randomFactOfADay.Description);
+                //var embedBuilder = new EmbedBuilder()
+                //    .WithColor(Color.Blue)
+                //    .WithTitle($"Random fact for Today! On this day in {randomFactOfADay.Year}:")
+                //    .WithDescription(randomFactOfADay.Description);
 
-                await restChannel.SendMessageAsync(embed: embedBuilder.Build());
+                //await restChannel.SendMessageAsync(embed: embedBuilder.Build());
             }
         }
 
