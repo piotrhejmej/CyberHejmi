@@ -34,6 +34,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           source: myservice.tar.gz
           target: /
+        
         run: |
           ssh -o StrictHostKeyChecking=no -t ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} bash /tmp/deploy.sh
 
