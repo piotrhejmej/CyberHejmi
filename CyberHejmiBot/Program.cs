@@ -27,19 +27,19 @@ namespace CyberHejmiBot
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseColouredConsoleLogProvider()
                 .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"));
+                .UseRecommendedSerializerSettings();
+                //.UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
                 //.UseActivator(new HangfireJobActivator(services));
 
-            using var server = new BackgroundJobServer();
+            //using var server = new BackgroundJobServer();
 
-            var dbContext = services.GetRequiredService<LocalDbContext>();
+            //var dbContext = services.GetRequiredService<LocalDbContext>();
 
-            dbContext.Database.Migrate();
-            dbContext.Seed();
+            //dbContext.Database.Migrate();
+            //dbContext.Seed();
 
-            var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
-            recurringJobsConfig.RegisterJobs();
+            //var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
+            //recurringJobsConfig.RegisterJobs();
 
             var startup = services.GetRequiredService<IStartup>();
             await startup.Init();
