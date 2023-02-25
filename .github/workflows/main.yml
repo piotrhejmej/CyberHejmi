@@ -14,8 +14,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t myservice .
-          docker save -o myservice.tar.gz myservice
+          docker build -t my-dotnet-service:${{ github.sha }} .
+          docker save -o my-dotnet-service:${{ github.sha }}.tar.gz my-dotnet-service:${{ github.sha }}
 
       # - name: Configure SSH
       #   uses: shimataro/ssh-key-action@v2
@@ -32,11 +32,8 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: myservice.tar.gz
+          source: my-dotnet-service:${{ github.sha }}.tar.gz
           target: /
-        
-        run: |
-          ssh -o StrictHostKeyChecking=no -t ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} bash /tmp/deploy.sh
 
       - name: Deploy to CentOS server
         uses: appleboy/ssh-action@master
