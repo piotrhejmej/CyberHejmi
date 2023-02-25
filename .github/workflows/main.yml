@@ -26,9 +26,9 @@ jobs:
           source: my-dotnet-service:${{ github.sha }}.tar.gz
           target: /tmp
 
-      - name: RUN
-        run: |
-          ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} -t ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} bash /tmp/deploy.sh
+      #- name: RUN
+      #  run: |
+      #    ssh -o StrictHostKeyChecking=no -i ${{ secrets.SSH_PRIVATE_KEY }} -t ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} bash /tmp/deploy.sh
 
       - name: Deploy to CentOS server
         uses: appleboy/ssh-action@master
