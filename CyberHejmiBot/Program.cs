@@ -28,8 +28,8 @@ namespace CyberHejmiBot
                 .UseColouredConsoleLogProvider()
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
-                .UseActivator(new HangfireJobActivator(services));
+                .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"));
+                //.UseActivator(new HangfireJobActivator(services));
 
             using var server = new BackgroundJobServer();
 
