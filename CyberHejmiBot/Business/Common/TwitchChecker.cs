@@ -34,7 +34,7 @@ namespace CyberHejmiBot.Business.Common
         {
             //web request to get auth token from twitch api
             var client = new HttpClient();
-
+             
             var response = await client.PostAsync(TWITCH_AUTH_API_URI, new FormUrlEncodedContent(new Dictionary<string, string>
             {
                 { "client_id", TWITCH_CLIENT_ID },
