@@ -41,7 +41,7 @@ namespace CyberHejmiBot.Business.Common
                 { "client_secret", TWITCH_CLIENT_SECRET },
                 { "grant_type", TWITCH_AUTH_API_GRANT_TYPE }
             }));
-
+             
             if (!response.IsSuccessStatusCode)
                 throw new Exception("Failed to get Twitch auth token");
 
