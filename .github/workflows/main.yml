@@ -16,6 +16,7 @@ jobs:
         run: |
           docker build -t my-dotnet-service:${{ github.sha }} .
           docker save -o my-dotnet-service:${{ github.sha }}.tar.gz my-dotnet-service:${{ github.sha }}
+          chmod 664 my-dotnet-service:${{ github.sha }}.tar.gz
 
       - name: Copy Docker image to server and run
         uses: appleboy/scp-action@master
