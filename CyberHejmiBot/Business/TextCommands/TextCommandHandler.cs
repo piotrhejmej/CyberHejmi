@@ -34,14 +34,11 @@ namespace CyberHejmiBot.Business.TextCommands
         {
             if (messageParam is not SocketUserMessage message) return;
 
-            if (messageParam.Author.Username == Environment.GetEnvironmentVariable("SUPER_SECRET"))
-                await SuperSpecialLover.SendLove(messageParam);
+            Console.WriteLine($"{messageParam.Channel.Name}:{messageParam.Channel.Id}");
 
             int argPos = 0;
 
-            if (!(message.HasCharPrefix('!', ref argPos) ||
-                message.HasMentionPrefix(Client.CurrentUser, ref argPos)) ||
-                message.Author.IsBot)
+            if (message.Author.IsBot)
                 return;
 
             var context = new SocketCommandContext(Client, message);
