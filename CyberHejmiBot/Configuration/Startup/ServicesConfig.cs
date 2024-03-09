@@ -66,7 +66,8 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<ISuperSpecialLover, SuperSpecialLover>()
                 .AddScoped<ISlashCommandsConfig, SlashCommandsConfig>()
                 .AddScoped<IRandomFactFetcher, RandomFactFetcher>()
-                .AddScoped<IRecurringJobsConfig, RecurringJobsConfig>();
+                .AddScoped<IRandomFactFetcher, RandomFactFetcher>()
+                .AddScoped<ITwitchChecker, TwitchChecker>();
 
             collection.AddClassesAsImplementedAbstractClass(Assembly.GetExecutingAssembly(), typeof(BaseSlashCommandHandler<ISlashCommand>));
             collection.AddClassesAsImplementedInterface(Assembly.GetExecutingAssembly(), typeof(IReccurringJob));

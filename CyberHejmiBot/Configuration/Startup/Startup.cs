@@ -2,14 +2,8 @@
 using CyberHejmiBot.Business.SlashCommands;
 using CyberHejmiBot.Business.TextCommands;
 using CyberHejmiBot.Configuration.Loging;
-using CyberHejmiBot.Configuration.Settings;
 using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Configuration.Startup
 {
