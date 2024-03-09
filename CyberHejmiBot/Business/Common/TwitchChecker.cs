@@ -23,30 +23,36 @@ namespace CyberHejmiBot.Business.Common
         public async Task<bool> IsMrStreamerOnline()
         {
             var client = await GetTwitchHttpClient();
+
+            if (client == null)
+                return false;
+
             var response = await client.GetAsync(TWITCH_API_URI);
+
+            if (!response.IsSuccessStatusCode)
+                return false;
+
             var responseContent = await response.Content.ReadAsStringAsync();
             var streamResponse = JsonConvert.DeserializeObject<TwitchSteamData>(responseContent);
 
-            return streamResponse?.data.Any() != null;
+            client.Dispose();
+            return streamResponse?.data.Any() == true;
         }
 
         private async Task<HttpClient> GetTwitchHttpClient()
         {
-            //web request to get auth token from twitch api
             var client = new HttpClient();
-             
-            var response = await client.PostAsync(TWITCH_AUTH_API_URI, new FormUrlEncodedContent(new Dictionary<string, string>
-            {
-                { "client_id", TWITCH_CLIENT_ID },
-                { "client_secret", TWITCH_CLIENT_SECRET },
-                { "grant_type", TWITCH_AUTH_API_GRANT_TYPE }
-            }));
-             
+
+            var response = await client.PostAsync($"{TWITCH_AUTH_API_URI}?client_id={TWITCH_CLIENT_ID}&client_secret={TWITCH_CLIENT_SECRET}&grant_type={TWITCH_AUTH_API_GRANT_TYPE}", null);
+
             if (!response.IsSuccessStatusCode)
-                throw new Exception("Failed to get Twitch auth token");
+                return null;
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var authResponse = JsonConvert.DeserializeObject<TwitchAuthResponse>(responseContent);
+
+            client.Dispose();
+            client = new HttpClient();
 
             client.BaseAddress = new Uri(TWITCH_API_URI);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authResponse.access_token}");
