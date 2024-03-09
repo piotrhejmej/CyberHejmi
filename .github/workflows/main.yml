@@ -23,8 +23,7 @@ jobs:
         with:
           host: ${{ secrets.CENTOS_SERVER }}
           username: ${{ secrets.CENTOS_USERNAME }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          password: ${{ secrets.CENTOS_PASSWORD }}
           source: my-dotnet-service:${{ github.sha }}.tar.gz
           target: /home/phejmej
 
