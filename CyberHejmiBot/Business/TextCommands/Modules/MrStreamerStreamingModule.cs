@@ -26,9 +26,9 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
             var isMrStreamerOnline = await _twitchChecker.IsMrStreamerOnline();
 
             if (isMrStreamerOnline)
-                await ReplyAsync("MrStreamer jest online!");
+                await ReplyAsync("Tak, Szymek streamuje");
             else
-                await ReplyAsync("MrStreamer nie jest online :(");
+                await ReplyAsync("Nie, Szymek nie streamuje");
         }
     }
 }

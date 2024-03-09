@@ -1,4 +1,5 @@
 ﻿using CyberHejmiBot.Business.SuperSpecial;
+using CyberHejmiBot.Configuration.Loging;
 using Discord.Commands;
 using Discord.WebSocket;
 using System.Reflection;
@@ -10,14 +11,14 @@ namespace CyberHejmiBot.Business.TextCommands
         private readonly DiscordSocketClient Client;
         private readonly CommandService Commands;
         private readonly IServiceProvider ServiceProvider;
-        private readonly ISuperSpecialLover SuperSpecialLover;
+        private readonly ILogger Logger;
 
-        public ExclamationTextCommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider serviceProvider, ISuperSpecialLover superSpecialLover)
+        public ExclamationTextCommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider serviceProvider, ILogger logger)
         {
             Client = client;
             Commands = commands;
             ServiceProvider = serviceProvider;
-            SuperSpecialLover = superSpecialLover;
+            Logger = logger;
         }
 
         public async Task InstallCommandsAsync()
@@ -32,9 +33,13 @@ namespace CyberHejmiBot.Business.TextCommands
         {
             if (messageParam is not SocketUserMessage message) return;
 
+            Console.WriteLine($"{messageParam.Channel.Name}:{messageParam.Channel.Id}");
+
             int argPos = 0;
 
-            if (message.Author.IsBot)
+            if (!(message.HasCharPrefix('!', ref argPos) ||
+                message.HasMentionPrefix(Client.CurrentUser, ref argPos)) ||
+                message.Author.IsBot)
                 return;
 
             var context = new SocketCommandContext(Client, message);
