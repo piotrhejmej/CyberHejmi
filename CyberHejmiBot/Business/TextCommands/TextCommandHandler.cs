@@ -12,14 +12,12 @@ namespace CyberHejmiBot.Business.TextCommands
         private readonly DiscordSocketClient Client;
         private readonly CommandService Commands;
         private readonly IServiceProvider ServiceProvider;
-        private readonly ISuperSpecialLover SuperSpecialLover;
 
-        public TextCommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider serviceProvider, ISuperSpecialLover superSpecialLover)
+        public TextCommandHandler(DiscordSocketClient client, CommandService commands, IServiceProvider serviceProvider)
         {
             Client = client;
             Commands = commands;
             ServiceProvider = serviceProvider;
-            SuperSpecialLover = superSpecialLover;
         }
 
         public async Task InstallCommandsAsync()
@@ -33,8 +31,6 @@ namespace CyberHejmiBot.Business.TextCommands
         private async Task HandleCommandAsync(SocketMessage messageParam)
         {
             if (messageParam is not SocketUserMessage message) return;
-
-            Console.WriteLine($"{messageParam.Channel.Name}:{messageParam.Channel.Id}");
 
             int argPos = 0;
 

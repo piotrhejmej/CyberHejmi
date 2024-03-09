@@ -1,6 +1,7 @@
 ﻿using CyberHejmiBot.Configuration.Settings;
 using CyberHejmiBot.Data.Entities.Birthdays;
 using CyberHejmiBot.Data.Entities.Facts;
+using CyberHejmiBot.Data.Entities.JobRelated;
 using CyberHejmiBot.Data.Entities.Seed;
 using CyberHejmiBot.Data.Entities.Wisdom;
 using CyberHejmiBot.Entities.Test;
@@ -22,6 +23,7 @@ namespace CyberHejmiBot.Entities
         public DbSet<WisdomEntry> WisdomEntries => Set<WisdomEntry>();
         public DbSet<FactsSubscription> FactsSubscriptions => Set<FactsSubscription>();
         public DbSet<Birthday> Birthdays => Set<Birthday>();
+        public DbSet<MrStreamerCheckerLogs> MrStreamerCheckerLogs => Set<MrStreamerCheckerLogs>();
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

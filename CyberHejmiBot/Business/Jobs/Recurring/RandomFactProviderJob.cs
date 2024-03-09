@@ -42,21 +42,6 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
             {
                 if (await BirthdayOverride(subscription))
                     continue;
-
-                //var randomFactOfADay = await RandomFactFetcher
-                //    .GetRandomFactOfToday(FactType.Event);
-
-                //if ((await Client
-                //   .Rest
-                //   .GetChannelAsync(subscription.ChannelId)) is not RestTextChannel restChannel)
-                //    continue;
-
-                //var embedBuilder = new EmbedBuilder()
-                //    .WithColor(Color.Blue)
-                //    .WithTitle($"Random fact for Today! On this day in {randomFactOfADay.Year}:")
-                //    .WithDescription(randomFactOfADay.Description);
-
-                //await restChannel.SendMessageAsync(embed: embedBuilder.Build());
             }
         }
 
@@ -87,9 +72,9 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 {
                     ImageUrl = jubilees.Any(r => r.HasCusomDescription) ? null : "https://media.tenor.com/dM2Tdvd4gsEAAAAC/wszystkiego-najlepszego.gif"
                 }
-                    .WithColor(Color.Gold)
-                    .WithTitle($"On this day in {String.Join(" and ", jubilees.Select(r => r.Date.Year))}:")
-                    .WithDescription(description);
+                .WithColor(Color.Gold)
+                .WithTitle($"On this day in {String.Join(" and ", jubilees.Select(r => r.Date.Year))}:")
+                .WithDescription(description);
 
                 await restChannel.SendMessageAsync(embed: embedBuilder.Build());
 
