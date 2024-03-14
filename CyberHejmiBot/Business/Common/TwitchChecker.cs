@@ -9,7 +9,7 @@ namespace CyberHejmiBot.Business.Common
 {
     public interface ITwitchChecker
     {
-        Task<bool> IsMrStreamerOnline();
+        Task<bool?> IsMrStreamerOnline();
     }
 
     public class TwitchChecker : ITwitchChecker
@@ -20,17 +20,17 @@ namespace CyberHejmiBot.Business.Common
         private const string TWITCH_AUTH_API_URI = "https://id.twitch.tv/oauth2/token";
         private const string TWITCH_API_URI = "https://api.twitch.tv/helix/streams?user_login=StreamKoderka";
         
-        public async Task<bool> IsMrStreamerOnline()
+        public async Task<bool?> IsMrStreamerOnline()
         {
             var client = await GetTwitchHttpClient();
 
             if (client == null)
-                return false;
+                return null;
 
             var response = await client.GetAsync(TWITCH_API_URI);
 
             if (!response.IsSuccessStatusCode)
-                return false;
+                return null;
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var streamResponse = JsonConvert.DeserializeObject<TwitchSteamData>(responseContent);
