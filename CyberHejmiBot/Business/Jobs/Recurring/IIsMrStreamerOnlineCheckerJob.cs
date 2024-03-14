@@ -29,12 +29,15 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         public async Task DoWork()
         {
-            var latestSuccessfulCheck = await DbContext
+            if (await DbContext.MrStreamerCheckerLogs.AnyAsync())
+            {
+                var latestSuccessfulCheck = await DbContext
                 .MrStreamerCheckerLogs
                 .MaxAsync(r => r.LastSuccessfullCheck);
 
-            if (latestSuccessfulCheck.Date == DateTime.Today.Date)
-                return;
+                if (latestSuccessfulCheck.Date == DateTime.Today.Date)
+                    return;
+            }
 
             var isMrStreamerOnline = await TwitchChecker.IsMrStreamerOnline();
 
