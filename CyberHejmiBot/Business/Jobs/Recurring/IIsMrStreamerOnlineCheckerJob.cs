@@ -38,7 +38,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
             var isMrStreamerOnline = await TwitchChecker.IsMrStreamerOnline();
 
-            if (isMrStreamerOnline)
+            if (isMrStreamerOnline == true)
             {
                 await ClearPreviousEntries();
                 var log = new MrStreamerCheckerLogs
