@@ -1,10 +1,5 @@
 ﻿using CyberHejmiBot.Business.Common;
 using Discord.Commands;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.TextCommands.Modules
 {
@@ -24,10 +19,14 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
         public async Task IsStreaming() 
         { 
             var isMrStreamerOnline = await _twitchChecker.IsMrStreamerOnline();
-            if (isMrStreamerOnline == null) {
+
+            if (!isMrStreamerOnline.IsSuccesfull) {
                 await ReplyAsync("błund");
+                await ReplyAsync(isMrStreamerOnline.Error);
+                return;
             }
-            if (isMrStreamerOnline == true)
+
+            if (isMrStreamerOnline.Result == true)
                 await ReplyAsync("Tak, Szymek streamuje");
             else
                 await ReplyAsync("Nie, Szymek nie streamuje");

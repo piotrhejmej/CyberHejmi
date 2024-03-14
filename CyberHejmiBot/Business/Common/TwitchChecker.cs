@@ -9,7 +9,14 @@ namespace CyberHejmiBot.Business.Common
 {
     public interface ITwitchChecker
     {
-        Task<bool?> IsMrStreamerOnline();
+        Task<CheckerResult> IsMrStreamerOnline();
+    }
+
+    public class CheckerResult
+    {
+        public bool IsSuccesfull { get; set; }
+        public string? Error { get; set; }
+        public bool Result { get; set; }
     }
 
     public class TwitchChecker : ITwitchChecker
@@ -19,34 +26,52 @@ namespace CyberHejmiBot.Business.Common
         private const string TWITCH_AUTH_API_GRANT_TYPE = "client_credentials";
         private const string TWITCH_AUTH_API_URI = "https://id.twitch.tv/oauth2/token";
         private const string TWITCH_API_URI = "https://api.twitch.tv/helix/streams?user_login=StreamKoderka";
-        
-        public async Task<bool?> IsMrStreamerOnline()
+        private string? Error;
+
+        public async Task<CheckerResult> IsMrStreamerOnline()
         {
             var client = await GetTwitchHttpClient();
 
             if (client == null)
-                return null;
+                return new CheckerResult
+                {
+                    IsSuccesfull = false,
+                    Error = $"{TWITCH_CLIENT_ID} {TWITCH_CLIENT_SECRET}"
+                };
 
             var response = await client.GetAsync(TWITCH_API_URI);
 
             if (!response.IsSuccessStatusCode)
-                return null;
+            {
+                return new CheckerResult
+                {
+                    IsSuccesfull = false,
+                    Error = $"{TWITCH_CLIENT_ID} {TWITCH_CLIENT_SECRET}"
+                };
+            };
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var streamResponse = JsonConvert.DeserializeObject<TwitchSteamData>(responseContent);
 
             client.Dispose();
-            return streamResponse?.data.Any() == true;
+            return new CheckerResult
+            {
+                IsSuccesfull = true,
+                Result = streamResponse?.data.Any() == true
+            };
         }
 
-        private async Task<HttpClient> GetTwitchHttpClient()
+        private async Task<HttpClient?> GetTwitchHttpClient()
         {
             var client = new HttpClient();
 
             var response = await client.PostAsync($"{TWITCH_AUTH_API_URI}?client_id={TWITCH_CLIENT_ID}&client_secret={TWITCH_CLIENT_SECRET}&grant_type={TWITCH_AUTH_API_GRANT_TYPE}", null);
 
             if (!response.IsSuccessStatusCode)
+            {
+                Error = response.StatusCode.ToString();
                 return null;
+            }
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var authResponse = JsonConvert.DeserializeObject<TwitchAuthResponse>(responseContent);
