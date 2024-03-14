@@ -29,25 +29,25 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         public async Task DoWork()
         {
-            var latestSuccessfulCheck = await DbContext
-                .MrStreamerCheckerLogs
-                .MaxAsync(r => r.LastSuccessfullCheck);
+            //var latestSuccessfulCheck = await DbContext
+            //    .MrStreamerCheckerLogs
+            //    .MaxAsync(r => r.LastSuccessfullCheck);
 
-            if (latestSuccessfulCheck.Date == DateTime.Today.Date)
-                return;
+            //if (latestSuccessfulCheck.Date == DateTime.Today.Date)
+            //    return;
 
             var isMrStreamerOnline = await TwitchChecker.IsMrStreamerOnline();
 
             if (isMrStreamerOnline.IsSuccesfull && isMrStreamerOnline.Result)
             {
-                await ClearPreviousEntries();
-                var log = new MrStreamerCheckerLogs
-                {
-                    LastSuccessfullCheck = DateTime.Now
-                };
+                //await ClearPreviousEntries();
+                //var log = new MrStreamerCheckerLogs
+                //{
+                //    LastSuccessfullCheck = DateTime.Now
+                //};
 
-                await DbContext.AddAsync(log);
-                await DbContext.SaveChangesAsync();
+                //await DbContext.AddAsync(log);
+                //await DbContext.SaveChangesAsync();
 
                 if (await Client.Rest.GetChannelAsync(CHANNEL_ID) is not RestTextChannel restChannel)
                     return;
