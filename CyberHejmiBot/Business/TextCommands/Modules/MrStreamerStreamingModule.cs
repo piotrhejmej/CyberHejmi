@@ -27,7 +27,7 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
             if (isMrStreamerOnline == null) {
                 await ReplyAsync("błund");
             }
-            if (isMrStreamerOnline)
+            if (isMrStreamerOnline == true)
                 await ReplyAsync("Tak, Szymek streamuje");
             else
                 await ReplyAsync("Nie, Szymek nie streamuje");
