@@ -16,7 +16,6 @@ namespace CyberHejmiBot
         public static async Task RunAsync()
         {
             using var services = ServicesConfig.CreateProvider();
-
             GlobalConfiguration.Configuration
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
                 .UseColouredConsoleLogProvider()
