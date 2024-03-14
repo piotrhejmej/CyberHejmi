@@ -14,8 +14,8 @@ namespace CyberHejmiBot.Business.Common
 
     public class TwitchChecker : ITwitchChecker
     {
-        private readonly string TWITCH_CLIENT_ID = Environment.GetEnvironmentVariable("BOT_TOKEN") ?? "";
-        private readonly string TWITCH_CLIENT_SECRET = Environment.GetEnvironmentVariable("BOT_TOKEN") ?? "";
+        private readonly string TWITCH_CLIENT_ID = Environment.GetEnvironmentVariable("TWITCH_CLIENT_ID") ?? "";
+        private readonly string TWITCH_CLIENT_SECRET = Environment.GetEnvironmentVariable("TWITCH_CLIENT_SECRET") ?? "";
         private const string TWITCH_AUTH_API_GRANT_TYPE = "client_credentials";
         private const string TWITCH_AUTH_API_URI = "https://id.twitch.tv/oauth2/token";
         private const string TWITCH_API_URI = "https://api.twitch.tv/helix/streams?user_login=StreamKoderka";
