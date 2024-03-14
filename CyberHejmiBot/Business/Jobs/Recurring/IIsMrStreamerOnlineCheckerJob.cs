@@ -24,7 +24,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         public void AddOrUpdate()
         {
-            RecurringJob.AddOrUpdate<IIsMrStreamerOnlineCheckerJob>(x => x.DoWork(), "*/15 16-19 * * *");
+            RecurringJob.AddOrUpdate<IIsMrStreamerOnlineCheckerJob>(x => x.DoWork(), "*/15 16-22 * * *");
         }
 
         public async Task DoWork()
