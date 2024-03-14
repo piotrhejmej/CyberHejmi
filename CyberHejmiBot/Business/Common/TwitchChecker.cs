@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -26,34 +27,34 @@ namespace CyberHejmiBot.Business.Common
         private const string TWITCH_AUTH_API_GRANT_TYPE = "client_credentials";
         private const string TWITCH_AUTH_API_URI = "https://id.twitch.tv/oauth2/token";
         private const string TWITCH_API_URI = "https://api.twitch.tv/helix/streams?user_login=StreamKoderka";
-        private string? Error;
 
         public async Task<CheckerResult> IsMrStreamerOnline()
         {
-            var client = await GetTwitchHttpClient();
+            var clientResult = await GetAuthorizedTwitchHttpClient();
 
-            if (client == null)
+            if (!clientResult.isSuccessfull || clientResult.httpClient is null)
                 return new CheckerResult
                 {
                     IsSuccesfull = false,
-                    Error = $"{TWITCH_CLIENT_ID} {TWITCH_CLIENT_SECRET}"
+                    Error = $"Code: {clientResult.statusCode}"
                 };
 
-            var response = await client.GetAsync(TWITCH_API_URI);
+            var response = await clientResult.httpClient.GetAsync(TWITCH_API_URI);
 
             if (!response.IsSuccessStatusCode)
             {
                 return new CheckerResult
                 {
                     IsSuccesfull = false,
-                    Error = $"{TWITCH_CLIENT_ID} {TWITCH_CLIENT_SECRET}"
+                    Error = $"{response.StatusCode}"
                 };
             };
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var streamResponse = JsonConvert.DeserializeObject<TwitchSteamData>(responseContent);
 
-            client.Dispose();
+            clientResult.httpClient.Dispose();
+
             return new CheckerResult
             {
                 IsSuccesfull = true,
@@ -61,7 +62,7 @@ namespace CyberHejmiBot.Business.Common
             };
         }
 
-        private async Task<HttpClient?> GetTwitchHttpClient()
+        private async Task<(bool isSuccessfull, HttpClient? httpClient, HttpStatusCode? statusCode)> GetAuthorizedTwitchHttpClient()
         {
             var client = new HttpClient();
 
@@ -69,8 +70,7 @@ namespace CyberHejmiBot.Business.Common
 
             if (!response.IsSuccessStatusCode)
             {
-                Error = response.StatusCode.ToString();
-                return null;
+                return (false, null, response.StatusCode);
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -83,7 +83,7 @@ namespace CyberHejmiBot.Business.Common
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authResponse.access_token}");
             client.DefaultRequestHeaders.Add("Client-Id", TWITCH_CLIENT_ID);
 
-            return client;
+            return (true, client, null);
         }
     }
 
