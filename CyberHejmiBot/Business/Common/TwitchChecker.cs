@@ -18,7 +18,7 @@ namespace CyberHejmiBot.Business.Common
         private readonly string TWITCH_CLIENT_SECRET = Environment.GetEnvironmentVariable("BOT_TOKEN") ?? "";
         private const string TWITCH_AUTH_API_GRANT_TYPE = "client_credentials";
         private const string TWITCH_AUTH_API_URI = "https://id.twitch.tv/oauth2/token";
-        private const string TWITCH_API_URI = "https://api.twitch.tv/helix/streams?user_login=streamkoderka";
+        private const string TWITCH_API_URI = "https://api.twitch.tv/helix/streams?user_login=StreamKoderka";
         
         public async Task<bool> IsMrStreamerOnline()
         {
