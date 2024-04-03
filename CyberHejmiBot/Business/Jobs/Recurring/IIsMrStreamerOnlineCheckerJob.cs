@@ -32,8 +32,8 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
             if (await DbContext.MrStreamerCheckerLogs.AnyAsync())
             {
                 var latestSuccessfulCheck = await DbContext
-                .MrStreamerCheckerLogs
-                .MaxAsync(r => r.LastSuccessfullCheck);
+                    .MrStreamerCheckerLogs
+                    .MaxAsync(r => r.LastSuccessfullCheck);
 
                 if (latestSuccessfulCheck.Date == DateTime.Today.Date)
                     return;
@@ -46,6 +46,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 await ClearPreviousEntries();
                 var log = new MrStreamerCheckerLogs
                 {
+                    JobName = nameof(IIsMrStreamerOnlineCheckerJob),
                     LastSuccessfullCheck = DateTime.Now
                 };
 
@@ -65,8 +66,11 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 .MrStreamerCheckerLogs
                 .ToListAsync();
 
-            DbContext.RemoveRange(logs);
-            await DbContext.SaveChangesAsync();
+            if (logs.Any())
+            {
+                DbContext.RemoveRange(logs);
+                await DbContext.SaveChangesAsync();
+            }
         }
     }
 }
