@@ -27,6 +27,14 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
             if (messageFunc == null)
             {
                 Console.WriteLine("messageFunc is null");
+
+                if (exception != null)
+                {
+                    Console.WriteLine(exception.Message);
+                    if (exception.InnerException != null)
+                        Console.WriteLine(exception.InnerException.Message);
+                }
+
                 return logLevel > LogLevel.Info;
             }
 
