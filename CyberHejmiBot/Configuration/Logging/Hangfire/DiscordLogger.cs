@@ -25,14 +25,20 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null)
         {
             if (messageFunc == null)
+            {
+                Console.WriteLine("messageFunc is null");
                 return logLevel > LogLevel.Info;
+            }
 
             if (logLevel == LogLevel.Error)
             {
                 var message = messageFunc();
 
                 if (Client.Rest.GetChannelAsync(CHANNEL_ID).Result is not RestTextChannel restChannel)
+                {
+                    Console.WriteLine("restchannel is null");
                     return false;
+                }
 
                 restChannel.SendMessageAsync($"Error: {message}");
 
