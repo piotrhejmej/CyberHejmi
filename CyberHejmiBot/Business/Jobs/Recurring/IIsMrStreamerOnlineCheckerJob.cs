@@ -59,11 +59,10 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 var embedded = new Discord.EmbedBuilder()
                 {
                     Url = "https://www.twitch.tv/StreamKoderka",
+                    ImageUrl = "https://media.tenor.com/rLrYjKCRnUUAAAAM/pingu-wave.gif"
                 }
                 .WithColor(Discord.Color.Gold)
-                .WithTimestamp(DateTimeOffset.Now)
-                .WithTitle("ej bo Szymek streamuje")
-                .WithDescription("wbijajcie");
+                .WithTitle("ej bo Szymek streamuje");
 
                 await restChannel.SendMessageAsync(embed: embedded.Build());
             }
