@@ -24,31 +24,16 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
 
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null)
         {
-            if (messageFunc == null)
-            {
-                Console.WriteLine("messageFunc is null");
-
-                if (exception != null)
-                {
-                    Console.WriteLine(exception.Message);
-                    if (exception.InnerException != null)
-                        Console.WriteLine(exception.InnerException.Message);
-                }
-
-                return logLevel > LogLevel.Info;
-            }
-
-            if (logLevel == LogLevel.Error)
-            {
-                var message = messageFunc();
-
+            //if (logLevel == LogLevel.Error)
+            //{
                 if (Client.Rest.GetChannelAsync(CHANNEL_ID).Result is not RestTextChannel restChannel)
                 {
                     Console.WriteLine("restchannel is null");
                     return false;
                 }
 
-                restChannel.SendMessageAsync($"Error: {message}");
+                if (messageFunc != null)
+                    restChannel.SendMessageAsync($"Error: {messageFunc()}");
 
                 if (exception != null)
                 {
@@ -57,7 +42,7 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
                     if (exception.InnerException != null)
                         restChannel.SendMessageAsync($"Inner Exception: {exception.InnerException.Message}");
                 }
-            }
+            //}
 
             return true;
         }
