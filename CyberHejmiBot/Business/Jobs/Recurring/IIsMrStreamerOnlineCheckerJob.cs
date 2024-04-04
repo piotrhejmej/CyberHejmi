@@ -47,7 +47,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 var log = new MrStreamerCheckerLogs
                 {
                     JobName = nameof(IIsMrStreamerOnlineCheckerJob),
-                    LastSuccessfullCheck = DateTime.Now
+                    LastSuccessfullCheck = DateTime.UtcNow
                 };
 
                 await DbContext.AddAsync(log);
