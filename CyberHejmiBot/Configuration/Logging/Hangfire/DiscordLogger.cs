@@ -24,8 +24,6 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
 
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null)
         {
-            var message = messageFunc();
-
             if (messageFunc == null)
                 return logLevel > LogLevel.Info;
 
