@@ -24,8 +24,15 @@ namespace CyberHejmiBot
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
                 .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
-                .UseActivator(new HangfireJobActivator(services))
-                .UseLogProvider(new DiscordLoggerProvider(services.GetService<DiscordSocketClient>()!));
+                .UseActivator(new HangfireJobActivator(services));
+
+            var discordClient = services.GetService<DiscordSocketClient>();
+
+            if (discordClient is null)
+                throw new InvalidOperationException("DiscordSocketClient is not registered in services.");
+
+            GlobalConfiguration.Configuration
+                .UseLogProvider(new DiscordLoggerProvider(discordClient));
 
             using var server = new BackgroundJobServer();
 
