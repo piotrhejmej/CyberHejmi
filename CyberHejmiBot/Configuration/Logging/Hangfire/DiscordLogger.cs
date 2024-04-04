@@ -26,6 +26,9 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
         {
             //if (logLevel == LogLevel.Error)
             //{
+            if (Client.LoginState != Discord.LoginState.LoggedIn)
+                return false;
+
                 if (Client.Rest.GetChannelAsync(CHANNEL_ID).Result is not RestTextChannel restChannel)
                 {
                     Console.WriteLine("restchannel is null");
