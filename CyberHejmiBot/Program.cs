@@ -1,6 +1,8 @@
 ﻿using CyberHejmiBot.Configuration.Hangfire;
+using CyberHejmiBot.Configuration.Logging.Hangfire;
 using CyberHejmiBot.Configuration.Startup;
 using CyberHejmiBot.Entities;
+using Discord.WebSocket;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +24,8 @@ namespace CyberHejmiBot
                 .UseSimpleAssemblyNameTypeSerializer()
                 .UseRecommendedSerializerSettings()
                 .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
-                .UseActivator(new HangfireJobActivator(services));
+                .UseActivator(new HangfireJobActivator(services))
+                .UseLogProvider(new DiscordLoggerProvider(services.GetService<DiscordSocketClient>()!));
 
             using var server = new BackgroundJobServer();
 
