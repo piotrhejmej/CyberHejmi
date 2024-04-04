@@ -28,29 +28,23 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
 
             if (isMrStreamerOnline.Result == true)
             {
-
                 var embedded = new Discord.EmbedBuilder()
                 {
                     Url = "https://www.twitch.tv/StreamKoderka",
                 }
                 .WithColor(Discord.Color.Gold)
-                .WithTimestamp(DateTimeOffset.Now)
-                .WithTitle("ej bo Szymek streamuje")
-                .WithDescription("wbijajcie");
+                .WithTitle("ej bo Szymek streamuje");
 
                 await ReplyAsync(embed: embedded.Build());  
             }
             else
             {
-
                 var embedded = new Discord.EmbedBuilder()
                 {
                     Url = "https://www.twitch.tv/StreamKoderka",
                 }
                 .WithColor(Discord.Color.Gold)
-                .WithTimestamp(DateTimeOffset.Now)
-                .WithTitle("ej bo Szymek streamuje")
-                .WithDescription("wbijajcie");
+                .WithTitle("ej bo Szymek streamuje");
 
                 await ReplyAsync(embed: embedded.Build());
             }
