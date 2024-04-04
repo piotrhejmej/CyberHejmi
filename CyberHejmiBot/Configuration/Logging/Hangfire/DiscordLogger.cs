@@ -26,6 +26,9 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
         {
             var message = messageFunc();
 
+            if (messageFunc == null)
+                return logLevel > LogLevel.Info;
+
             if (logLevel == LogLevel.Error)
             {
                 if (Client.Rest.GetChannelAsync(CHANNEL_ID).Result is not RestTextChannel restChannel)
