@@ -26,6 +26,8 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
                 return;
             }
 
+            ReplyAsync(this.Context.Channel.Id.ToString());
+
             if (isMrStreamerOnline.Result == true)
                 await ReplyAsync("Tak, Szymek streamuje");
             else
