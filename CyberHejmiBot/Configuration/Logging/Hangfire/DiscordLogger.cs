@@ -24,9 +24,9 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
 
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null)
         {
-            //if (logLevel == LogLevel.Error)
-            //{
-            if (Client.LoginState != Discord.LoginState.LoggedIn)
+            if (logLevel == LogLevel.Error)
+            {
+                if (Client.LoginState != Discord.LoginState.LoggedIn)
                 return false;
 
                 if (Client.Rest.GetChannelAsync(CHANNEL_ID).Result is not RestTextChannel restChannel)
@@ -45,7 +45,7 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
                     if (exception.InnerException != null)
                         restChannel.SendMessageAsync($"Inner Exception: {exception.InnerException.Message}");
                 }
-            //}
+            }
 
             return true;
         }
