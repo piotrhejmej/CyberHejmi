@@ -42,7 +42,7 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
                 var embedded = new Discord.EmbedBuilder()
                 {
                     Url = "https://www.twitch.tv/StreamKoderka",
-                    ImageUrl = "Static/Files/streamkoderka.png"
+                    ImageUrl = "https://media.tenor.com/rLrYjKCRnUUAAAAM/pingu-wave.gif"
                 }
                 .WithColor(Discord.Color.Gold)
                 .WithTitle("ej bo Szymek streamuje");
