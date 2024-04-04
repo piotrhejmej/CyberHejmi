@@ -27,24 +27,30 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
             if (logLevel == LogLevel.Error)
             {
                 if (Client.LoginState != Discord.LoginState.LoggedIn)
-                return false;
+                    return false;
 
                 if (Client.Rest.GetChannelAsync(CHANNEL_ID).Result is not RestTextChannel restChannel)
-                {
-                    Console.WriteLine("restchannel is null");
                     return false;
-                }
 
-                if (messageFunc != null)
-                    restChannel.SendMessageAsync($"Error: {messageFunc()}");
+                var embedded = new Discord.EmbedBuilder()
+                    .WithColor(Discord.Color.Red)
+                    .WithTimestamp(DateTimeOffset.UtcNow);
+
+                embedded.WithTitle(messageFunc is not null ? messageFunc() : "Error");
 
                 if (exception != null)
                 {
-                    restChannel.SendMessageAsync($"Exception: {exception.Message}");
+                    var stringBuilder = new StringBuilder();
+                    stringBuilder.AppendLine($"Exception: {exception.Message}");
+                    stringBuilder.AppendLine("---------");
 
-                    if (exception.InnerException != null)
-                        restChannel.SendMessageAsync($"Inner Exception: {exception.InnerException.Message}");
+                    if (exception.InnerException != null) 
+                        stringBuilder.AppendLine($"Inner Exception: {exception.InnerException.Message}");
+
+                    embedded.WithDescription(stringBuilder.ToString());
                 }
+
+                restChannel.SendMessageAsync(embed: embedded.Build());
             }
 
             return true;
