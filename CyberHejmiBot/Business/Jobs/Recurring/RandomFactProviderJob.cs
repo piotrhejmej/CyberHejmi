@@ -1,4 +1,5 @@
 ﻿using CyberHejmiBot.Business.Common;
+using CyberHejmiBot.Configuration.Logging.DebugLogger;
 using CyberHejmiBot.Data.Entities.Birthdays;
 using CyberHejmiBot.Data.Entities.Facts;
 using CyberHejmiBot.Entities;
@@ -18,13 +19,13 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
     {
         private readonly DiscordSocketClient Client;
         private readonly LocalDbContext DbContext;
-        private readonly IRandomFactFetcher RandomFactFetcher;
+        private readonly IDebugLogger Logger;
 
-        public RandomFactProviderJob(DiscordSocketClient client, LocalDbContext dbContext, IRandomFactFetcher randomFactFetcher)
+        public RandomFactProviderJob(DiscordSocketClient client, LocalDbContext dbContext, IDebugLogger logger)
         {
             Client = client;
             DbContext = dbContext;
-            RandomFactFetcher = randomFactFetcher;
+            Logger = logger;
         }
 
         public void AddOrUpdate()
@@ -54,7 +55,9 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 .Where(b => b.GuildId == subscription.GuildId)
                 .Where(r => r.Date.Month == today.Month && r.Date.Day == today.Day)
                 .ToList();
-           
+
+            Logger.LogInfo("BirthdayOverride", new Exception($"Found {jubilees.Count} jubilees for guild {subscription.GuildId}."));   
+            
             if (jubilees.Any())
             {
                 if (await Client

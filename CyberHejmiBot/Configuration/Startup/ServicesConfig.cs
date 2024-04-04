@@ -19,6 +19,7 @@ using CyberHejmiBot.Business.SlashCommands;
 using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Business.Jobs.Recurring;
 using CyberHejmiBot.Business.TextCommands;
+using CyberHejmiBot.Configuration.Logging.DebugLogger;
 
 namespace CyberHejmiBot.Configuration.Startup
 {
@@ -67,6 +68,7 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<ISlashCommandsConfig, SlashCommandsConfig>()
                 .AddScoped<IRandomFactFetcher, RandomFactFetcher>()
                 .AddScoped<IRecurringJobsConfig, RecurringJobsConfig>()
+                .AddScoped<IDebugLogger, DebugLogger>()
                 .AddScoped<ITwitchChecker, TwitchChecker>();
 
             collection.AddClassesAsImplementedAbstractClass(Assembly.GetExecutingAssembly(), typeof(BaseSlashCommandHandler<ISlashCommand>));
