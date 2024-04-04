@@ -56,7 +56,16 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 if (await Client.Rest.GetChannelAsync(CHANNEL_ID) is not RestTextChannel restChannel)
                     return;
 
-                await restChannel.SendMessageAsync("ej bo Szymek streamuje");
+                var embedded = new Discord.EmbedBuilder()
+                {
+                    Url = "https://www.twitch.tv/StreamKoderka",
+                }
+                .WithColor(Discord.Color.Gold)
+                .WithTimestamp(DateTimeOffset.Now)
+                .WithTitle("ej bo Szymek streamuje")
+                .WithDescription("wbijajcie");
+
+                await restChannel.SendMessageAsync(embed: embedded.Build());
             }
         }
 

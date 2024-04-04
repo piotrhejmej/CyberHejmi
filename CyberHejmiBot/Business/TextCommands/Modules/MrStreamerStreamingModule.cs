@@ -27,9 +27,33 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
             }
 
             if (isMrStreamerOnline.Result == true)
-                await ReplyAsync("Tak, Szymek streamuje");
+            {
+
+                var embedded = new Discord.EmbedBuilder()
+                {
+                    Url = "https://www.twitch.tv/StreamKoderka",
+                }
+                .WithColor(Discord.Color.Gold)
+                .WithTimestamp(DateTimeOffset.Now)
+                .WithTitle("ej bo Szymek streamuje")
+                .WithDescription("wbijajcie");
+
+                await ReplyAsync(embed: embedded.Build());  
+            }
             else
-                await ReplyAsync("Nie, Szymek nie streamuje");
+            {
+
+                var embedded = new Discord.EmbedBuilder()
+                {
+                    Url = "https://www.twitch.tv/StreamKoderka",
+                }
+                .WithColor(Discord.Color.Gold)
+                .WithTimestamp(DateTimeOffset.Now)
+                .WithTitle("ej bo Szymek streamuje")
+                .WithDescription("wbijajcie");
+
+                await ReplyAsync(embed: embedded.Build());
+            }
         }
     }
 }
