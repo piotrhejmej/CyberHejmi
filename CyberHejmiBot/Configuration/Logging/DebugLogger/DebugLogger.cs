@@ -41,7 +41,7 @@ namespace CyberHejmiBot.Configuration.Logging.DebugLogger
             if (exception != null)
             {
                 var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine($"Exception: {exception.Message}");
+                stringBuilder.AppendLine($"{Enum.GetName(typeof(LogLevel), logLevel)}: {exception.Message}");
                 stringBuilder.AppendLine("---------");
 
                 if (exception.InnerException != null)
