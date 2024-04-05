@@ -1,4 +1,5 @@
 ﻿using CyberHejmiBot.Business.Common;
+using CyberHejmiBot.Configuration.Logging.DebugLogger;
 using CyberHejmiBot.Data.Entities.JobRelated;
 using CyberHejmiBot.Entities;
 using Discord.Rest;
@@ -14,12 +15,14 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
         private readonly ITwitchChecker TwitchChecker;
         private readonly LocalDbContext DbContext;
         private const ulong CHANNEL_ID = 920773991394869248;
+        private readonly IDebugLogger Logger;
 
-        public IIsMrStreamerOnlineCheckerJob(DiscordSocketClient client, ITwitchChecker twitchChecker, LocalDbContext dbContext)
+        public IIsMrStreamerOnlineCheckerJob(DiscordSocketClient client, ITwitchChecker twitchChecker, LocalDbContext dbContext, IDebugLogger logger)
         {
             Client = client;
             TwitchChecker = twitchChecker;
             DbContext = dbContext;
+            Logger = logger;
         }
 
         public void AddOrUpdate()
@@ -29,6 +32,8 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         public async Task DoWork()
         {
+            Logger.LogInfo("Checking if MrStreamer have db entry for today");
+
             if (await DbContext.MrStreamerCheckerLogs.AnyAsync())
             {
                 var latestSuccessfulCheck = await DbContext
@@ -39,11 +44,27 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                     return;
             }
 
+            Logger.LogInfo("Checking if MrStreamer has no entry for today");
+
+            Logger.LogInfo("Checking if MrStreamer is online");
             var isMrStreamerOnline = await TwitchChecker.IsMrStreamerOnline();
+
+            if (!isMrStreamerOnline.IsSuccesfull)
+            {
+                Logger.LogError("Error while checking if MrStreamer is online", new Exception(isMrStreamerOnline.Error));
+                return;
+            }
 
             if (isMrStreamerOnline.IsSuccesfull && isMrStreamerOnline.Result)
             {
+                Logger.LogInfo("MrStreamer is online");
+
+                Logger.LogInfo("Clearing previous entries");
+
                 await ClearPreviousEntries();
+
+                Logger.LogInfo("Adding new entry");
+
                 var log = new MrStreamerCheckerLogs
                 {
                     JobName = nameof(IIsMrStreamerOnlineCheckerJob),
@@ -52,6 +73,8 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
                 await DbContext.AddAsync(log);
                 await DbContext.SaveChangesAsync();
+
+                Logger.LogInfo("Sending message to channel");
 
                 if (await Client.Rest.GetChannelAsync(CHANNEL_ID) is not RestTextChannel restChannel)
                     return;
@@ -63,6 +86,8 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 }
                 .WithColor(Discord.Color.Gold)
                 .WithTitle("ej bo Szymek streamuje");
+
+                Logger.LogInfo("Message sent");
 
                 await restChannel.SendMessageAsync(embed: embedded.Build());
             }
