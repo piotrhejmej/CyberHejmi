@@ -44,7 +44,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                     return;
             }
 
-            Logger.LogInfo("Checking if MrStreamer has no entry for today");
+            Logger.LogInfo("MrStreamer has no entry for today");
 
             Logger.LogInfo("Checking if MrStreamer is online");
             var isMrStreamerOnline = await TwitchChecker.IsMrStreamerOnline();
