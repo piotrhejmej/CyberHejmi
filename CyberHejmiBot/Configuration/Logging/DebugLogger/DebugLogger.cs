@@ -42,10 +42,12 @@ namespace CyberHejmiBot.Configuration.Logging.DebugLogger
             {
                 var stringBuilder = new StringBuilder();
                 stringBuilder.AppendLine($"{Enum.GetName(typeof(LogLevel), logLevel)}: {exception.Message}");
-                stringBuilder.AppendLine("---------");
 
                 if (exception.InnerException != null)
+                {
+                    stringBuilder.AppendLine("---------");
                     stringBuilder.AppendLine($"Inner Exception: {exception.InnerException.Message}");
+                }
 
                 embedded.WithDescription(stringBuilder.ToString());
             }
