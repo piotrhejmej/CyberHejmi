@@ -1,1 +1,1 @@
-CyberHejmiBot.
+CyberHejmiBot
