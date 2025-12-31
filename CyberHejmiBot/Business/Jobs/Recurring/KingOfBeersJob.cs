@@ -125,22 +125,22 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         private class TenorResponse
         {
-            public TenorResult[] Results { get; set; }
+            public TenorResult[]? Results { get; set; }
         }
 
         private class TenorResult
         {
-            public TenorMedia[] Media { get; set; }
+            public TenorMedia[]? Media { get; set; }
         }
 
         private class TenorMedia
         {
-            public TenorGif Gif { get; set; }
+            public TenorGif? Gif { get; set; }
         }
 
         private class TenorGif
         {
-            public string Url { get; set; }
+            public string? Url { get; set; }
         }
     }
 }

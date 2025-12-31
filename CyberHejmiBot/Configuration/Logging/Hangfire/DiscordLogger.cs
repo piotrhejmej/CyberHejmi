@@ -14,7 +14,7 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
             _name = name;
         }
 
-        public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null)
+        public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception? exception = null)
         {
             var msLevel = MapLevel(logLevel);
 
