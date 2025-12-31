@@ -58,6 +58,7 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddSingleton(commandServiceConfig)
                 .AddSingleton<CommandService>()
                 .AddSingleton(botSettings)
+                .AddSingleton<DiscordLogService>()
                 .AddScoped<TextCommandHandler>()
                 .AddScoped<ILogger, ConsoleLogger>()
                 .AddScoped<IGuildEventsListener, GuildEventsListener>()

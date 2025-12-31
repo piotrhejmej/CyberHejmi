@@ -1,5 +1,7 @@
-﻿using CyberHejmiBot.Configuration.Hangfire;
+﻿using CyberHejmiBot.Business.Common;
+using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Configuration.Logging.Hangfire;
+using CyberHejmiBot.Configuration.Settings;
 using CyberHejmiBot.Configuration.Startup;
 using CyberHejmiBot.Entities;
 using Discord.WebSocket;
@@ -31,8 +33,10 @@ namespace CyberHejmiBot
             if (discordClient is null)
                 throw new InvalidOperationException("DiscordSocketClient is not registered in services.");
 
+            var logService = services.GetRequiredService<DiscordLogService>();
+
             GlobalConfiguration.Configuration
-                .UseLogProvider(new DiscordLoggerProvider(discordClient));
+                .UseLogProvider(new DiscordHangfireLogProvider(logService));
 
             using var server = new BackgroundJobServer();
 
