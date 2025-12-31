@@ -1,5 +1,6 @@
 ﻿using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Configuration.Logging.DebugLogger;
+using CyberHejmiBot.Configuration.Settings;
 using CyberHejmiBot.Data.Entities.JobRelated;
 using CyberHejmiBot.Entities;
 using Discord.Rest;
@@ -14,15 +15,16 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
         private readonly DiscordSocketClient Client;
         private readonly ITwitchChecker TwitchChecker;
         private readonly LocalDbContext DbContext;
-        private const ulong CHANNEL_ID = 920773991394869248;
+        private readonly BotSettings BotSettings;
         private readonly IDebugLogger Logger;
 
-        public IIsMrStreamerOnlineCheckerJob(DiscordSocketClient client, ITwitchChecker twitchChecker, LocalDbContext dbContext, IDebugLogger logger)
+        public IIsMrStreamerOnlineCheckerJob(DiscordSocketClient client, ITwitchChecker twitchChecker, LocalDbContext dbContext, IDebugLogger logger, BotSettings botSettings)
         {
             Client = client;
             TwitchChecker = twitchChecker;
             DbContext = dbContext;
             Logger = logger;
+            BotSettings = botSettings;
         }
 
         public void AddOrUpdate()
@@ -71,7 +73,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
                 Logger.LogInfo("Sending message to channel");
 
-                if (await Client.Rest.GetChannelAsync(CHANNEL_ID) is not RestTextChannel restChannel)
+                if (await Client.Rest.GetChannelAsync(BotSettings.StreamerChannelId) is not RestTextChannel restChannel)
                     return;
 
                 var embedded = new Discord.EmbedBuilder()

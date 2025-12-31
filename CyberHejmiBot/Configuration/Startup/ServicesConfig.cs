@@ -1,5 +1,6 @@
 ﻿using CyberHejmiBot.Business.Events;
 using CyberHejmiBot.Business.Events.GuildEvents;
+using CyberHejmiBot.Business.Events.Karma;
 using CyberHejmiBot.Configuration.Loging;
 using CyberHejmiBot.Configuration.Settings;
 using CyberHejmiBot.Entities;
@@ -62,6 +63,7 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<TextCommandHandler>()
                 .AddScoped<ILogger, ConsoleLogger>()
                 .AddScoped<IGuildEventsListener, GuildEventsListener>()
+                .AddScoped<IKarmaEventListener, KarmaEventListener>()
                 .AddScoped<IEventListener, EventListener>()
                 .AddScoped<IStartup, Startup>()
                 .AddScoped<IRemoveEventTextChannelJob, RemoveEventTextChannelJob>()
