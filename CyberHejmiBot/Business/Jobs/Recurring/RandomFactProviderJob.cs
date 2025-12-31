@@ -30,7 +30,11 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         public void AddOrUpdate()
         {
-            RecurringJob.AddOrUpdate<RandomFactProviderJob>(x => x.DoWork(), Cron.Daily(7));
+            RecurringJob.AddOrUpdate<RandomFactProviderJob>(
+                x => x.DoWork(),
+                Cron.Daily(9),
+                TimeZoneInfo.FindSystemTimeZoneById("Europe/Warsaw")
+            );
         }
 
         public async Task DoWork()
