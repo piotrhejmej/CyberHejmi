@@ -43,13 +43,21 @@ namespace CyberHejmiBot.Business.Events.Karma
             if (message.Author.IsBot)
                 return;
 
-            var userKarma = await _dbContext.UserKarma.FirstOrDefaultAsync(x => x.UserId == message.Author.Id);
+            // Ensure it's a guild channel
+            if (channelCache.Value is not SocketGuildChannel guildChannel)
+                return;
+
+            var guildId = guildChannel.Guild.Id;
+
+            var userKarma = await _dbContext.UserKarma
+                .FirstOrDefaultAsync(x => x.UserId == message.Author.Id && x.GuildId == guildId);
 
             if (userKarma == null)
             {
                 userKarma = new UserKarma
                 {
                     UserId = message.Author.Id,
+                    GuildId = guildId,
                     Points = 0
                 };
                 await _dbContext.UserKarma.AddAsync(userKarma);
