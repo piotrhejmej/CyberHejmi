@@ -61,7 +61,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 
                 var embedBuilder = new EmbedBuilder()
                     .WithTitle("👑 Król Piwek Miesiąca! 👑")
-                    .WithDescription($"W tym miesiącu tytuł Króla Piwek zdobywa **{userName}** z wynikiem **{topKarmaUser.Points}** piwek! 🍺\n\nGratulujemy i życzymy smacznego! 🍻")
+                    .WithDescription($"W tym miesiącu tytuł Króla Piwek 🍺 zdobywa **{userName}** z wynikiem **{topKarmaUser.Points}** piwek! 🍺\n\nGratulujemy i życzymy smacznego! 🍻")
                     .WithColor(Color.Gold);
 
                 if (imageUrl.StartsWith("http"))
