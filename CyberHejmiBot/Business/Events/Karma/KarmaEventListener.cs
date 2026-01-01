@@ -34,6 +34,12 @@ namespace CyberHejmiBot.Business.Events.Karma
             var emoteId = (reaction.Emote as Emote)?.Id;
             _logger.LogWarning($"Reaction received: Name='{reaction.Emote.Name}', ID='{emoteId}', Type='{reaction.Emote.GetType().Name}', ToString='{reaction.Emote}'");
 
+            var channel = await channelCache.GetOrDownloadAsync();
+            if (channel is IMessageChannel messageChannel)
+            {
+                await messageChannel.SendMessageAsync($"DEBUG: Reaction detected! Name: `{reaction.Emote.Name}`, ID: `{emoteId}`, Type: `{reaction.Emote.GetType().Name}`");
+            }
+
             // Temporary debug: allow any reaction to log details
             // if (reaction.Emote.Name != "🍺" && reaction.Emote.Name != "🍻")
             //    return;
