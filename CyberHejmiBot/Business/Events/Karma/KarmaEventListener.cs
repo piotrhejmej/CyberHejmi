@@ -31,18 +31,8 @@ namespace CyberHejmiBot.Business.Events.Karma
 
         private async Task OnReactionAdded(Cacheable<IUserMessage, ulong> messageCache, Cacheable<IMessageChannel, ulong> channelCache, SocketReaction reaction)
         {
-            var emoteId = (reaction.Emote as Emote)?.Id;
-            _logger.LogWarning($"Reaction received: Name='{reaction.Emote.Name}', ID='{emoteId}', Type='{reaction.Emote.GetType().Name}', ToString='{reaction.Emote}'");
-
-            var channel = await channelCache.GetOrDownloadAsync();
-            if (channel is IMessageChannel messageChannel)
-            {
-                await messageChannel.SendMessageAsync($"DEBUG: Reaction detected! Name: `{reaction.Emote.Name}`, ID: `{emoteId}`, Type: `{reaction.Emote.GetType().Name}`");
-            }
-
-            // Temporary debug: allow any reaction to log details
-            // if (reaction.Emote.Name != "🍺" && reaction.Emote.Name != "🍻")
-            //    return;
+            if (reaction.Emote.Name != "🍺" && reaction.Emote.Name != "🍻")
+                return;
 
             var message = await messageCache.GetOrDownloadAsync();
             if (message == null)
