@@ -34,7 +34,7 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
 
             if (!karmaStats.Any())
             {
-                await ReplyAsync("No karma stats found for this server.");
+                await ReplyAsync($"No karma stats found for this server {Context.Guild.Id}.");
                 return;
             }
 
