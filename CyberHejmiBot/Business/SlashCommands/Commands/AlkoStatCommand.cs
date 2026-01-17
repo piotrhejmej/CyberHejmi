@@ -47,11 +47,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             try
             {
                 var year = DateTime.UtcNow.Year;
-                var userId = command.User.Id;
-
-                var logs = await _dbContext
-                    .AlkoStats.Where(x => x.UserId == userId && x.Date.Year == year)
-                    .ToListAsync();
+                var logs = await GetLogsForYear(command.User.Id, year);
 
                 if (!logs.Any())
                 {
@@ -62,30 +58,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                     return true;
                 }
 
-                var stats = _calculator.Calculate(logs, year);
-                var embed = _calculator.BuildEmbed(
-                    stats,
-                    year,
-                    $"Alcohol Stats for {year}",
-                    $"Here are your stats for {year}:"
-                );
-
-                try
-                {
-                    await command.User.SendMessageAsync(embed: embed);
-                    await command.RespondAsync("Sent your stats via DM!", ephemeral: true);
-                }
-                catch (Discord.Net.HttpException ex)
-                {
-                    _logger.LogWarning(
-                        ex,
-                        $"Could not send DM to user {command.User.Username} ({command.User.Id}) in {CommandName}"
-                    );
-                    await command.RespondAsync(
-                        "I couldn't send you a DM. Please check your privacy settings.",
-                        ephemeral: true
-                    );
-                }
+                await SendStats(command, logs, year);
             }
             catch (Exception ex)
             {
@@ -97,6 +70,42 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             }
 
             return true;
+        }
+
+
+        private async Task<List<AlkoStat>> GetLogsForYear(ulong userId, int year)
+        {
+            return await _dbContext
+                .AlkoStats.Where(x => x.UserId == userId && x.Date.Year == year)
+                .ToListAsync();
+        }
+
+        private async Task SendStats(SocketSlashCommand command, List<AlkoStat> logs, int year)
+        {
+            var stats = _calculator.Calculate(logs, year);
+            var embed = _calculator.BuildEmbed(
+                stats,
+                year,
+                $"Alcohol Stats for {year}",
+                $"Here are your stats for {year}:"
+            );
+
+            try
+            {
+                await command.User.SendMessageAsync(embed: embed);
+                await command.RespondAsync("Sent your stats via DM!", ephemeral: true);
+            }
+            catch (Discord.Net.HttpException ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    $"Could not send DM to user {command.User.Username} ({command.User.Id}) in {CommandName}"
+                );
+                await command.RespondAsync(
+                    "I couldn't send you a DM. Please check your privacy settings.",
+                    ephemeral: true
+                );
+            }
         }
     }
 }
