@@ -1,14 +1,14 @@
 using System.Text;
-using AlkoStatEntity = CyberHejmiBot.Data.Entities.Alcohol.AlkoStat;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using AlkoStatEntity = CyberHejmiBot.Data.Entities.Alcohol.AlkoStat;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
 {
-    public class AlkoEntryListCommand : BaseSlashCommandHandler<ISlashCommand>
+    public class AlkoEntryListCommand : BaseSlashCommandHandler<ISlashCommand>, IAlkoCommand
     {
         private readonly LocalDbContext _dbContext;
         private readonly ILogger<AlkoEntryListCommand> _logger;
@@ -18,12 +18,24 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
         public override string CommandName => "alko-entry-list";
         public override string Description => "Lists your alcohol log entries.";
 
+        public List<AdditionalOption> Options =>
+            new List<AdditionalOption>
+            {
+                new AdditionalOption(
+                    "page",
+                    "Page number (default 0)",
+                    false,
+                    ApplicationCommandOptionType.Integer
+                ),
+            };
+
         public AlkoEntryListCommand(
             DiscordSocketClient client,
             LocalDbContext dbContext,
             ILogger<AlkoEntryListCommand> logger,
             AlkoEntryListValidator validator
-        ) : base(client, logger)
+        )
+            : base(client, logger)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -32,17 +44,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
 
         public override async Task<SlashCommandProperties> Register()
         {
-            var options = new List<AdditionalOption>
-            {
-                new AdditionalOption(
-                    "page",
-                    "Page number (default 0)",
-                    false,
-                    ApplicationCommandOptionType.Integer
-                )
-            };
-
-            return await base.Register(options);
+            return await base.Register(Options);
         }
 
         public override async Task<bool> DoWork(SocketSlashCommand command)
@@ -53,9 +55,10 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
             try
             {
                 await command.DeferAsync(ephemeral: true);
-                
-                var pageOption = command.Data.Options.FirstOrDefault(x => x.Name == "page")?.Value as long?;
-                
+
+                var pageOption =
+                    command.Data.Options.FirstOrDefault(x => x.Name == "page")?.Value as long?;
+
                 if (!_validator.ValidatePage(pageOption, out var page, out var error))
                 {
                     await command.FollowupAsync(error, ephemeral: true);
@@ -65,30 +68,30 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
                 var (entries, totalCount) = await FetchEntries(command.User.Id, page);
 
                 var response = BuildResponse(entries, totalCount, page);
-                await command.FollowupAsync(response, ephemeral: true);
+                await command.User.SendMessageAsync(response);
+                await command.FollowupAsync("📬 I've sent the list to your DMs!", ephemeral: true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in {CommandName}");
-                await command.FollowupAsync("An error occurred while fetching the list.", ephemeral: true);
+                await command.FollowupAsync(
+                    "An error occurred while fetching the list.",
+                    ephemeral: true
+                );
             }
 
             return true;
         }
 
-        private int GetPage(SocketSlashCommand command)
-        {
-            var pageOption = command.Data.Options.FirstOrDefault(x => x.Name == "page")?.Value;
-            var page = pageOption != null ? Convert.ToInt32(pageOption) : 0;
-            return Math.Max(0, page);
-        }
-
-        private async Task<(List<AlkoStatEntity> entries, int totalCount)> FetchEntries(ulong userId, int page)
+        private async Task<(List<AlkoStatEntity> entries, int totalCount)> FetchEntries(
+            ulong userId,
+            int page
+        )
         {
             var baseQuery = _dbContext.AlkoStats.Where(x => x.UserId == userId);
-            
+
             var totalCount = await baseQuery.CountAsync();
-            
+
             var entries = await baseQuery
                 .OrderByDescending(x => x.Date)
                 .ThenByDescending(x => x.CreatedAt)
@@ -104,7 +107,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
             var sb = new StringBuilder();
             sb.AppendLine($"**Alcohol Logs (Page {page}) - Total: {totalCount}**");
             sb.AppendLine("```");
-            sb.AppendLine($"{"Date",-12} | {"Amount",-8} | {"%",-4} | {"ID"}");
+            sb.AppendLine($"{"Date", -12} | {"Amount", -8} | {"%", -4} | {"ID"}");
             sb.AppendLine(new string('-', 60));
 
             foreach (var entry in entries)
@@ -113,7 +116,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
                 var amountStr = entry.AmountMl.HasValue ? $"{entry.AmountMl}ml" : "-";
                 var percStr = entry.Percentage.HasValue ? $"{entry.Percentage}%" : "-";
 
-                sb.AppendLine($"{dateStr,-12} | {amountStr,-8} | {percStr,-4} | {entry.Id}");
+                sb.AppendLine($"{dateStr, -12} | {amountStr, -8} | {percStr, -4} | {entry.Id}");
             }
             sb.AppendLine("```");
             sb.AppendLine("Use `/alko-entry-remove [id]` to delete an entry.");

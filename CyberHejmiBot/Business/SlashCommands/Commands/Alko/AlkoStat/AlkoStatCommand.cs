@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
 {
-    public class AlkoStatCommand : BaseSlashCommandHandler<ISlashCommand>
+    public class AlkoStatCommand : BaseSlashCommandHandler<ISlashCommand>, IAlkoCommand
     {
         private readonly LocalDbContext _dbContext;
         private readonly ILogger<AlkoStatCommand> _logger;
@@ -16,6 +16,16 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
 
         public override string CommandName => "alko-stat";
         public override string Description => "Shows alcohol statistics for the user.";
+
+        public List<AdditionalOption> Options => new List<AdditionalOption>
+        {
+            new AdditionalOption(
+                "year",
+                "Year to show stats for (defaults to current year)",
+                false,
+                ApplicationCommandOptionType.Integer
+            )
+        };
 
         public AlkoStatCommand(
             DiscordSocketClient client,
@@ -32,17 +42,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
 
         public override async Task<SlashCommandProperties> Register()
         {
-            var options = new List<AdditionalOption>
-            {
-                new AdditionalOption(
-                    "year",
-                    "Year to show stats for (defaults to current year)",
-                    false,
-                    ApplicationCommandOptionType.Integer
-                )
-            };
-
-            return await base.Register(options);
+            return await base.Register(Options);
         }
 
         public override async Task<bool> DoWork(SocketSlashCommand command)

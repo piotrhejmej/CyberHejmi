@@ -1,13 +1,13 @@
 using CyberHejmiBot.Entities;
-using AlkoStatEntity = CyberHejmiBot.Data.Entities.Alcohol.AlkoStat;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using AlkoStatEntity = CyberHejmiBot.Data.Entities.Alcohol.AlkoStat;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryRemove
 {
-    public class AlkoEntryRemoveCommand : BaseSlashCommandHandler<ISlashCommand>
+    public class AlkoEntryRemoveCommand : BaseSlashCommandHandler<ISlashCommand>, IAlkoCommand
     {
         private readonly LocalDbContext _dbContext;
         private readonly ILogger<AlkoEntryRemoveCommand> _logger;
@@ -16,12 +16,24 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryRemove
         public override string CommandName => "alko-entry-remove";
         public override string Description => "Removes an alcohol log entry by ID.";
 
+        public List<AdditionalOption> Options =>
+            new List<AdditionalOption>
+            {
+                new AdditionalOption(
+                    "id",
+                    "The ID of the entry to remove (from list)",
+                    true,
+                    ApplicationCommandOptionType.String
+                ),
+            };
+
         public AlkoEntryRemoveCommand(
             DiscordSocketClient client,
             LocalDbContext dbContext,
             ILogger<AlkoEntryRemoveCommand> logger,
             AlkoEntryRemoveValidator validator
-        ) : base(client, logger)
+        )
+            : base(client, logger)
         {
             _dbContext = dbContext;
             _logger = logger;
@@ -30,17 +42,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryRemove
 
         public override async Task<SlashCommandProperties> Register()
         {
-            var options = new List<AdditionalOption>
-            {
-                new AdditionalOption(
-                    "id",
-                    "The ID of the entry to remove (from list)",
-                    true,
-                    ApplicationCommandOptionType.String
-                )
-            };
-
-            return await base.Register(options);
+            return await base.Register(Options);
         }
 
         public override async Task<bool> DoWork(SocketSlashCommand command)
@@ -54,7 +56,10 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryRemove
 
                 if (!TryGetId(command, out var id))
                 {
-                    await command.FollowupAsync("❌ Invalid ID format. Please use the UUID from `/alko-entry-list`.", ephemeral: true);
+                    await command.FollowupAsync(
+                        "❌ Invalid ID format. Please use the UUID from `/alko-entry-list`.",
+                        ephemeral: true
+                    );
                     return true;
                 }
 
@@ -72,7 +77,10 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryRemove
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in {CommandName}");
-                await command.FollowupAsync("An error occurred while removing the entry.", ephemeral: true);
+                await command.FollowupAsync(
+                    "An error occurred while removing the entry.",
+                    ephemeral: true
+                );
             }
 
             return true;
@@ -93,7 +101,8 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryRemove
         private string BuildSuccessMessage(AlkoStatEntity entry)
         {
             var deletedDetails = $"Date: {entry.Date:dd-MM-yyyy}";
-            if (entry.AmountMl.HasValue) deletedDetails += $", {entry.AmountMl}ml";
+            if (entry.AmountMl.HasValue)
+                deletedDetails += $", {entry.AmountMl}ml";
             return $"✅ Deleted entry ({deletedDetails}).";
         }
     }
