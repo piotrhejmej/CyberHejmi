@@ -1,5 +1,5 @@
 ﻿using CyberHejmiBot.Business.Jobs.Recurring;
-using CyberHejmiBot.Configuration.Loging;
+using Microsoft.Extensions.Logging;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -17,7 +17,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
         private readonly RandomFactProviderJob RandomFactProviderJob;
 
-        public TestCommandHandler(RandomFactProviderJob randomFactProviderJob, DiscordSocketClient client, ILogger logger) : base(client, logger)
+        public TestCommandHandler(RandomFactProviderJob randomFactProviderJob, DiscordSocketClient client, ILogger<TestCommandHandler> logger) : base(client, logger)
         {
             RandomFactProviderJob = randomFactProviderJob;
         }

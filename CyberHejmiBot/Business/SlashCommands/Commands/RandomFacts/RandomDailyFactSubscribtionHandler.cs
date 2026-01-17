@@ -1,4 +1,4 @@
-﻿using CyberHejmiBot.Configuration.Loging;
+﻿using Microsoft.Extensions.Logging;
 using CyberHejmiBot.Data.Entities.Facts;
 using CyberHejmiBot.Entities;
 using Discord;
@@ -23,7 +23,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
         };
         private readonly LocalDbContext DbContext;
 
-        public RandomDailyFactSubscribtionHandler(DiscordSocketClient client, ILogger logger, LocalDbContext dbContext) : base(client, logger)
+        public RandomDailyFactSubscribtionHandler(DiscordSocketClient client, ILogger<RandomDailyFactSubscribtionHandler> logger, LocalDbContext dbContext) : base(client, logger)
         {
             Client = client;
             Logger = logger;

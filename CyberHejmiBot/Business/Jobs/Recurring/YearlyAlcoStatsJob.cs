@@ -1,15 +1,15 @@
-using CyberHejmiBot.Business.Jobs.Recurring;
-using CyberHejmiBot.Data.Entities.Alcohol;
-using CyberHejmiBot.Entities;
-using CyberHejmiBot.Business.Common.Calculators;
-using CyberHejmiBot.Configuration.Logging.DebugLogger;
-using Hangfire;
-using Discord;
-using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CyberHejmiBot.Business.Common.Calculators;
+using CyberHejmiBot.Business.Jobs.Recurring;
+using CyberHejmiBot.Data.Entities.Alcohol;
+using CyberHejmiBot.Entities;
+using Discord;
+using Discord.WebSocket;
+using Hangfire;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.Jobs.Recurring
 {
@@ -18,19 +18,27 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
         private readonly LocalDbContext _dbContext;
         private readonly DiscordSocketClient _client;
         private readonly IAlkoStatsCalculator _calculator;
-        private readonly IDebugLogger _debugLogger;
+        private readonly ILogger<YearlyAlcoStatsJob> _logger;
 
-        public YearlyAlcoStatsJob(LocalDbContext dbContext, DiscordSocketClient client, IAlkoStatsCalculator calculator, IDebugLogger debugLogger)
+        public YearlyAlcoStatsJob(
+            LocalDbContext dbContext,
+            DiscordSocketClient client,
+            IAlkoStatsCalculator calculator,
+            ILogger<YearlyAlcoStatsJob> logger
+        )
         {
             _dbContext = dbContext;
             _client = client;
             _calculator = calculator;
-            _debugLogger = debugLogger;
+            _logger = logger;
         }
 
         public void AddOrUpdate()
         {
-            Hangfire.RecurringJob.AddOrUpdate<YearlyAlcoStatsJob>(x => x.DoWork(), Cron.Yearly(1, 1, 12, 0));
+            Hangfire.RecurringJob.AddOrUpdate<YearlyAlcoStatsJob>(
+                x => x.DoWork(),
+                Cron.Yearly(1, 1, 12, 0)
+            );
         }
 
         public async Task DoWork()
@@ -38,9 +46,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
             try
             {
                 var year = DateTime.UtcNow.Year - 1; // Stats for the previous year
-                var logs = await _dbContext.AlkoStats
-                    .Where(x => x.Date.Year == year)
-                    .ToListAsync();
+                var logs = await _dbContext.AlkoStats.Where(x => x.Date.Year == year).ToListAsync();
 
                 if (!logs.Any())
                     return;
@@ -55,22 +61,30 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                     if (user == null)
                         continue;
 
-                    try 
+                    try
                     {
                         var stats = _calculator.Calculate(group, year);
-                        var embed = _calculator.BuildEmbed(stats, year, $"Alcohol Stats for {year}", $"Here is your summary for the year of {year}:");
+                        var embed = _calculator.BuildEmbed(
+                            stats,
+                            year,
+                            $"Alcohol Stats for {year}",
+                            $"Here is your summary for the year of {year}:"
+                        );
 
                         await user.SendMessageAsync(embed: embed);
                     }
                     catch (Exception ex)
                     {
-                        _debugLogger.LogWarning($"Error sending yearly stats to user {userId} (likely DMs blocked)", ex);
+                        _logger.LogWarning(
+                            ex,
+                            $"Error sending yearly stats to user {userId} (likely DMs blocked)"
+                        );
                     }
                 }
             }
             catch (Exception ex)
             {
-                _debugLogger.LogError("Error in YearlyAlcoStatsJob", ex);
+                _logger.LogError(ex, "Error in YearlyAlcoStatsJob");
             }
         }
     }

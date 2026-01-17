@@ -1,42 +1,60 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using CyberHejmiBot.Business.SlashCommands;
-using CyberHejmiBot.Entities;
 using CyberHejmiBot.Data.Entities.Alcohol;
-using CyberHejmiBot.Configuration.Logging.DebugLogger;
-using CyberHejmiBot.Configuration.Loging;
+using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands
 {
     public class AlkoAddCommand : BaseSlashCommandHandler<ISlashCommand>
     {
         private readonly LocalDbContext _dbContext;
-        private readonly IDebugLogger _debugLogger;
+        private readonly ILogger<AlkoAddCommand> _logger;
 
         public override string CommandName => "alko-add";
         public override string Description => "Log specific alcohol amount and percentage";
 
-        public AlkoAddCommand(DiscordSocketClient client, ILogger logger, LocalDbContext dbContext, IDebugLogger debugLogger) 
+        public AlkoAddCommand(
+            DiscordSocketClient client,
+            LocalDbContext dbContext,
+            ILogger<AlkoAddCommand> logger
+        )
             : base(client, logger)
         {
             _dbContext = dbContext;
-            _debugLogger = debugLogger;
+            _logger = logger;
         }
 
         public override async Task Register()
         {
             var options = new List<AdditionalOption>
             {
-                new AdditionalOption("amount", "Amount in ml", true, ApplicationCommandOptionType.Integer),
-                new AdditionalOption("percentage", "Alcohol percentage (e.g. 5, 40)", true, ApplicationCommandOptionType.Number),
-                new AdditionalOption("date", "Date of consumption (DD-MM-YYYY) - Optional, defaults to today", false, ApplicationCommandOptionType.String)
+                new AdditionalOption(
+                    "amount",
+                    "Amount in ml",
+                    true,
+                    ApplicationCommandOptionType.Integer
+                ),
+                new AdditionalOption(
+                    "percentage",
+                    "Alcohol percentage (e.g. 5, 40)",
+                    true,
+                    ApplicationCommandOptionType.Number
+                ),
+                new AdditionalOption(
+                    "date",
+                    "Date of consumption (DD-MM-YYYY) - Optional, defaults to today",
+                    false,
+                    ApplicationCommandOptionType.String
+                ),
             };
-            
+
             await base.Register(options);
         }
 
@@ -47,16 +65,32 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
             try
             {
-                var amount = Convert.ToInt32(command.Data.Options.First(x => x.Name == "amount").Value);
-                var percentage = Convert.ToSingle(command.Data.Options.First(x => x.Name == "percentage").Value);
-                var dateOption = command.Data.Options.FirstOrDefault(x => x.Name == "date")?.Value as string;
+                var amount = Convert.ToInt32(
+                    command.Data.Options.First(x => x.Name == "amount").Value
+                );
+                var percentage = Convert.ToSingle(
+                    command.Data.Options.First(x => x.Name == "percentage").Value
+                );
+                var dateOption =
+                    command.Data.Options.FirstOrDefault(x => x.Name == "date")?.Value as string;
                 var date = DateTime.UtcNow.Date;
 
                 if (!string.IsNullOrEmpty(dateOption))
                 {
-                    if (!DateTime.TryParseExact(dateOption, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out date))
+                    if (
+                        !DateTime.TryParseExact(
+                            dateOption,
+                            "dd-MM-yyyy",
+                            null,
+                            System.Globalization.DateTimeStyles.None,
+                            out date
+                        )
+                    )
                     {
-                        await command.RespondAsync("Invalid date format. Please use DD-MM-YYYY.", ephemeral: true);
+                        await command.RespondAsync(
+                            "Invalid date format. Please use DD-MM-YYYY.",
+                            ephemeral: true
+                        );
                         return true;
                     }
                 }
@@ -67,7 +101,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                     Date = date,
                     AmountMl = amount,
                     Percentage = percentage,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
                 };
 
                 _dbContext.AlkoStats.Add(entry);
@@ -75,19 +109,30 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
                 try
                 {
-                    await command.User.SendMessageAsync($"Logged {amount}ml of {percentage}% alcohol for {date:dd-MM-yyyy}.");
+                    await command.User.SendMessageAsync(
+                        $"Logged {amount}ml of {percentage}% alcohol for {date:dd-MM-yyyy}."
+                    );
                     await command.RespondAsync("Done! Check your DMs.", ephemeral: true);
                 }
                 catch (Discord.Net.HttpException ex)
                 {
-                     _debugLogger.LogWarning($"Could not send DM to user {command.User.Username} ({command.User.Id}) in {CommandName}", ex);
-                    await command.RespondAsync("I couldn't send you a DM. Please check your privacy settings.", ephemeral: true);
+                    _logger.LogWarning(
+                        ex,
+                        $"Could not send DM to user {command.User.Username} ({command.User.Id}) in {CommandName}"
+                    );
+                    await command.RespondAsync(
+                        "I couldn't send you a DM. Please check your privacy settings.",
+                        ephemeral: true
+                    );
                 }
             }
             catch (Exception ex)
             {
-                _debugLogger.LogError($"Error in {CommandName}", ex);
-                await command.RespondAsync("An unexpected error occurred. Administrators have been notified.", ephemeral: true);
+                _logger.LogError(ex, $"Error in {CommandName}");
+                await command.RespondAsync(
+                    "An unexpected error occurred. Administrators have been notified.",
+                    ephemeral: true
+                );
             }
 
             return true;

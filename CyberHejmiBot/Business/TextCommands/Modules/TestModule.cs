@@ -1,6 +1,5 @@
 ﻿using CyberHejmiBot.Business.Jobs.Recurring;
 using CyberHejmiBot.Configuration.Hangfire;
-using CyberHejmiBot.Configuration.Loging;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.Commands;

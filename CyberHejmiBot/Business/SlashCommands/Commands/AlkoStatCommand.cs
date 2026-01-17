@@ -1,15 +1,14 @@
-using CyberHejmiBot.Business.SlashCommands;
-using CyberHejmiBot.Entities;
-using CyberHejmiBot.Data.Entities.Alcohol;
-using CyberHejmiBot.Business.Common.Calculators;
-using CyberHejmiBot.Configuration.Logging.DebugLogger;
-using CyberHejmiBot.Configuration.Loging;
-using Discord;
-using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using CyberHejmiBot.Business.Common.Calculators;
+using CyberHejmiBot.Business.SlashCommands;
+using CyberHejmiBot.Data.Entities.Alcohol;
+using CyberHejmiBot.Entities;
+using Discord;
+using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands
 {
@@ -17,17 +16,22 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
     {
         private readonly LocalDbContext _dbContext;
         private readonly IAlkoStatsCalculator _calculator;
-        private readonly IDebugLogger _debugLogger;
+        private readonly Microsoft.Extensions.Logging.ILogger<AlkoStatCommand> _logger;
 
         public override string CommandName => "alko-stat";
         public override string Description => "Get your alcohol consumption statistics";
 
-        public AlkoStatCommand(DiscordSocketClient client, ILogger logger, LocalDbContext dbContext, IAlkoStatsCalculator calculator, IDebugLogger debugLogger) 
+        public AlkoStatCommand(
+            DiscordSocketClient client,
+            LocalDbContext dbContext,
+            IAlkoStatsCalculator calculator,
+            ILogger<AlkoStatCommand> logger
+        )
             : base(client, logger)
         {
             _dbContext = dbContext;
             _calculator = calculator;
-            _debugLogger = debugLogger;
+            _logger = logger;
         }
 
         public override async Task Register()
@@ -45,18 +49,26 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                 var year = DateTime.UtcNow.Year;
                 var userId = command.User.Id;
 
-                var logs = await _dbContext.AlkoStats
-                    .Where(x => x.UserId == userId && x.Date.Year == year)
+                var logs = await _dbContext
+                    .AlkoStats.Where(x => x.UserId == userId && x.Date.Year == year)
                     .ToListAsync();
 
                 if (!logs.Any())
                 {
-                    await command.RespondAsync("No alcohol consumption logged for this year.", ephemeral: true);
+                    await command.RespondAsync(
+                        "No alcohol consumption logged for this year.",
+                        ephemeral: true
+                    );
                     return true;
                 }
 
                 var stats = _calculator.Calculate(logs, year);
-                var embed = _calculator.BuildEmbed(stats, year, $"Alcohol Stats for {year}", $"Here are your stats for {year}:");
+                var embed = _calculator.BuildEmbed(
+                    stats,
+                    year,
+                    $"Alcohol Stats for {year}",
+                    $"Here are your stats for {year}:"
+                );
 
                 try
                 {
@@ -65,14 +77,23 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                 }
                 catch (Discord.Net.HttpException ex)
                 {
-                     _debugLogger.LogWarning($"Could not send DM to user {command.User.Username} ({command.User.Id}) in {CommandName}", ex);
-                    await command.RespondAsync("I couldn't send you a DM. Please check your privacy settings.", ephemeral: true);
+                    _logger.LogWarning(
+                        ex,
+                        $"Could not send DM to user {command.User.Username} ({command.User.Id}) in {CommandName}"
+                    );
+                    await command.RespondAsync(
+                        "I couldn't send you a DM. Please check your privacy settings.",
+                        ephemeral: true
+                    );
                 }
             }
             catch (Exception ex)
             {
-                 _debugLogger.LogError($"Error in {CommandName}", ex);
-                 await command.RespondAsync("An unexpected error occurred. Administrators have been notified.", ephemeral: true);
+                _logger.LogError(ex, $"Error in {CommandName}");
+                await command.RespondAsync(
+                    "An unexpected error occurred. Administrators have been notified.",
+                    ephemeral: true
+                );
             }
 
             return true;

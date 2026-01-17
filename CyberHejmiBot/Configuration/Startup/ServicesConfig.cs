@@ -1,7 +1,8 @@
 ﻿using CyberHejmiBot.Business.Events;
 using CyberHejmiBot.Business.Events.GuildEvents;
-using CyberHejmiBot.Configuration.Loging;
+using CyberHejmiBot.Configuration.Logging;
 using CyberHejmiBot.Configuration.Settings;
+using Microsoft.Extensions.Logging;
 using CyberHejmiBot.Entities;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -19,7 +20,6 @@ using CyberHejmiBot.Business.SlashCommands;
 using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Business.Jobs.Recurring;
 using CyberHejmiBot.Business.TextCommands;
-using CyberHejmiBot.Configuration.Logging.DebugLogger;
 using CyberHejmiBot.Business.Common.Calculators;
 
 namespace CyberHejmiBot.Configuration.Startup
@@ -49,7 +49,6 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddSingleton<CommandService>()
                 .AddSingleton(botSettings)
                 .AddScoped<TextCommandHandler>()
-                .AddScoped<ILogger, ConsoleLogger>()
                 .AddScoped<IGuildEventsListener, GuildEventsListener>()
                 .AddScoped<IEventListener, EventListener>()
                 .AddScoped<IStartup, Startup>()
@@ -58,7 +57,7 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<ISlashCommandsConfig, SlashCommandsConfig>()
                 .AddScoped<IRandomFactFetcher, RandomFactFetcher>()
                 .AddScoped<IRecurringJobsConfig, RecurringJobsConfig>()
-                .AddScoped<IDebugLogger, DebugLogger>()
+                .AddSingleton<ILoggerProvider, DiscordChannelLoggerProvider>()
                 .AddScoped<ITwitchChecker, TwitchChecker>()
                 .AddScoped<IAlkoStatsCalculator, AlkoStatsCalculator>();
 
