@@ -5,6 +5,7 @@ using CyberHejmiBot.Data.Entities.JobRelated;
 using CyberHejmiBot.Data.Entities.Seed;
 using CyberHejmiBot.Data.Entities.Wisdom;
 using CyberHejmiBot.Entities.Test;
+using CyberHejmiBot.Data.Entities.Alcohol;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -24,9 +25,21 @@ namespace CyberHejmiBot.Entities
         public DbSet<FactsSubscription> FactsSubscriptions => Set<FactsSubscription>();
         public DbSet<Birthday> Birthdays => Set<Birthday>();
         public DbSet<MrStreamerCheckerLogs> MrStreamerCheckerLogs => Set<MrStreamerCheckerLogs>();
+        public DbSet<AlkoStat> AlkoStats => Set<AlkoStat>();
+        
+        public LocalDbContext(DbContextOptions<LocalDbContext> options) : base(options)
+        {
+        }
+
+        public LocalDbContext()
+        {
+        }
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+             if (optionsBuilder.IsConfigured)
+                return;
+
             var connectionString = Environment.GetEnvironmentVariable("Db_ConnectionString");
 
             if (connectionString == null)

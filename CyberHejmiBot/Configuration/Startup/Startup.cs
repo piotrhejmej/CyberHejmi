@@ -12,7 +12,7 @@ namespace CyberHejmiBot.Configuration.Startup
         Task Init();
     }
 
-    internal class Startup: IStartup
+    internal class Startup : IStartup
     {
         private readonly DiscordSocketClient Client;
         private readonly TextCommandHandler CommandHandler;
@@ -20,11 +20,13 @@ namespace CyberHejmiBot.Configuration.Startup
         private readonly IEventListener EventListener;
         private readonly ISlashCommandsConfig SlashCommandsConfig;
 
-        public Startup(DiscordSocketClient client,
-                       TextCommandHandler commandHandler,
-                       ILogger logger,
-                       IEventListener eventListener,
-                       ISlashCommandsConfig slashCommandsConfig)
+        public Startup(
+            DiscordSocketClient client,
+            TextCommandHandler commandHandler,
+            ILogger logger,
+            IEventListener eventListener,
+            ISlashCommandsConfig slashCommandsConfig
+        )
         {
             Client = client;
             CommandHandler = commandHandler;

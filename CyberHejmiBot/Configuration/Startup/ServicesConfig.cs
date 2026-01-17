@@ -20,26 +20,16 @@ using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Business.Jobs.Recurring;
 using CyberHejmiBot.Business.TextCommands;
 using CyberHejmiBot.Configuration.Logging.DebugLogger;
+using CyberHejmiBot.Business.Common.Calculators;
 
 namespace CyberHejmiBot.Configuration.Startup
 {
     internal static class ServicesConfig
     {
-        public static ServiceProvider CreateProvider()
+
+        public static void Register(IServiceCollection collection)
         {
-            var serviceCollection = RegisterServices();
-
-            serviceCollection
-                .AddMediatR(typeof(Program));
-
-            return serviceCollection.BuildServiceProvider();
-        }
-
-        private static IServiceCollection RegisterServices()
-        {
-            var collection = new ServiceCollection();
-           
-            var config = new DiscordSocketConfig();
+             var config = new DiscordSocketConfig();
             var commandServiceConfig = new CommandServiceConfig();
             var botSettings = JsonConvert.DeserializeObject<BotSettings>(File.ReadAllText("BotSettings.json"))
                 ?? new BotSettings();
@@ -69,12 +59,28 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<IRandomFactFetcher, RandomFactFetcher>()
                 .AddScoped<IRecurringJobsConfig, RecurringJobsConfig>()
                 .AddScoped<IDebugLogger, DebugLogger>()
-                .AddScoped<ITwitchChecker, TwitchChecker>();
+                .AddScoped<ITwitchChecker, TwitchChecker>()
+                .AddScoped<IAlkoStatsCalculator, AlkoStatsCalculator>();
 
             collection.AddClassesAsImplementedAbstractClass(Assembly.GetExecutingAssembly(), typeof(BaseSlashCommandHandler<ISlashCommand>));
             collection.AddClassesAsImplementedInterface(Assembly.GetExecutingAssembly(), typeof(IReccurringJob));
             
-            return collection;
+            collection.AddMediatR(typeof(Program));
+        }
+
+        public static ServiceProvider CreateProvider()
+        {
+            var collection = new ServiceCollection();
+            Register(collection);
+            return collection.BuildServiceProvider();
+        }
+
+        private static IServiceCollection RegisterServices() 
+        {
+             // Deprecated private method kept for structure if needed but logic moved to Register(collection)
+             var collection = new ServiceCollection();
+             Register(collection);
+             return collection;
         }
 
         private static List<TypeInfo>? GetTypesAssignableTo(this Assembly assembly, Type compareType)

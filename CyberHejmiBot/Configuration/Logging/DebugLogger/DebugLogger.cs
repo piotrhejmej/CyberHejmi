@@ -1,8 +1,8 @@
-﻿using Discord;
+﻿using System.Text;
+using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
-using System.Text;
 
 namespace CyberHejmiBot.Configuration.Logging.DebugLogger
 {
@@ -14,7 +14,7 @@ namespace CyberHejmiBot.Configuration.Logging.DebugLogger
         bool LogError(string message, Exception? exception = null);
     }
 
-    public class DebugLogger: IDebugLogger
+    public class DebugLogger : IDebugLogger
     {
         private readonly DiscordSocketClient Client;
         private static ulong CHANNEL_ID = 1012391792014008353;
@@ -33,20 +33,24 @@ namespace CyberHejmiBot.Configuration.Logging.DebugLogger
                 return false;
 
             var embedded = new Discord.EmbedBuilder()
-                   .WithColor(LogColors[logLevel])
-                   .WithTimestamp(DateTimeOffset.UtcNow);
+                .WithColor(LogColors[logLevel])
+                .WithTimestamp(DateTimeOffset.UtcNow);
 
             embedded.WithTitle(message ?? "Error");
 
             if (exception != null)
             {
                 var stringBuilder = new StringBuilder();
-                stringBuilder.AppendLine($"{Enum.GetName(typeof(LogLevel), logLevel)}: {exception.Message}");
+                stringBuilder.AppendLine(
+                    $"{Enum.GetName(typeof(LogLevel), logLevel)}: {exception.Message}"
+                );
 
                 if (exception.InnerException != null)
                 {
                     stringBuilder.AppendLine("---------");
-                    stringBuilder.AppendLine($"Inner Exception: {exception.InnerException.Message}");
+                    stringBuilder.AppendLine(
+                        $"Inner Exception: {exception.InnerException.Message}"
+                    );
                 }
 
                 embedded.WithDescription(stringBuilder.ToString());
@@ -72,14 +76,17 @@ namespace CyberHejmiBot.Configuration.Logging.DebugLogger
             return Log(LogLevel.Error, message, exception);
         }
 
-        private static readonly Dictionary<LogLevel, Color> LogColors = new Dictionary<LogLevel, Color>
+        private static readonly Dictionary<LogLevel, Color> LogColors = new Dictionary<
+            LogLevel,
+            Color
+        >
         {
             { LogLevel.Trace, Color.Blue },
             { LogLevel.Debug, Color.DarkPurple },
             { LogLevel.Information, Color.Blue },
             { LogLevel.Warning, Color.Orange },
             { LogLevel.Error, Color.Red },
-            { LogLevel.Critical, Color.DarkRed }
+            { LogLevel.Critical, Color.DarkRed },
         };
     }
 }
