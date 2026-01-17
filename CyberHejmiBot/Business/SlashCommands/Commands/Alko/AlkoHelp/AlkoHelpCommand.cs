@@ -39,16 +39,17 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
             await command.DeferAsync(ephemeral: true);
 
             var commands = GetOrLoadCommands();
-            var sb = new StringBuilder();
-            sb.AppendLine("## 🍺 Alko-Tracker Helpers 🍺");
-            sb.AppendLine("Here are the commands you can use:");
-            sb.AppendLine();
+            
+            var embedBuilder = new EmbedBuilder()
+                .WithTitle("🍺 Alko-Tracker Helpers 🍺")
+                .WithDescription("Here are the commands you can use:")
+                .WithColor(Color.Gold);
 
             foreach (var cmd in commands)
             {
-                sb.AppendLine($"### `/{cmd.Name}`");
+                var sb = new StringBuilder();
                 sb.AppendLine($"> {cmd.Description}");
-
+                
                 if (cmd.Options.Any())
                 {
                     sb.AppendLine("**Parameters:**");
@@ -62,10 +63,23 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
                 {
                     sb.AppendLine("*No parameters.*");
                 }
-                sb.AppendLine();
+
+                embedBuilder.AddField($"/{cmd.Name}", sb.ToString());
             }
 
-            await command.FollowupAsync(sb.ToString(), ephemeral: true);
+            try 
+            {
+                await command.User.SendMessageAsync(embed: embedBuilder.Build());
+                await command.FollowupAsync("📬 I've sent the help list to your DMs!", ephemeral: true);
+            }
+            catch (Discord.Net.HttpException)
+            {
+                await command.FollowupAsync(
+                    "❌ I couldn't send you a DM. Please check your privacy settings.",
+                    ephemeral: true
+                );
+            }
+
             return true;
         }
 
