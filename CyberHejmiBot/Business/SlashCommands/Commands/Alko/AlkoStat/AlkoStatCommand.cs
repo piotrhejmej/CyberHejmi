@@ -1,38 +1,48 @@
 using CyberHejmiBot.Business.Common.Calculators;
-using CyberHejmiBot.Data.Entities.Alcohol;
+using AlkoStatEntity = CyberHejmiBot.Data.Entities.Alcohol.AlkoStat;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace CyberHejmiBot.Business.SlashCommands.Commands
+namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
 {
     public class AlkoStatCommand : BaseSlashCommandHandler<ISlashCommand>
     {
         private readonly LocalDbContext _dbContext;
+        private readonly ILogger<AlkoStatCommand> _logger;
         private readonly IAlkoStatsCalculator _calculator;
-        private readonly Microsoft.Extensions.Logging.ILogger<AlkoStatCommand> _logger;
 
         public override string CommandName => "alko-stat";
-        public override string Description => "Get your alcohol consumption statistics";
+        public override string Description => "Shows alcohol statistics for the user.";
 
         public AlkoStatCommand(
             DiscordSocketClient client,
             LocalDbContext dbContext,
-            IAlkoStatsCalculator calculator,
-            ILogger<AlkoStatCommand> logger
+            ILogger<AlkoStatCommand> logger,
+            IAlkoStatsCalculator calculator
         )
             : base(client, logger)
         {
             _dbContext = dbContext;
-            _calculator = calculator;
             _logger = logger;
+            _calculator = calculator;
         }
 
         public override async Task<SlashCommandProperties> Register()
         {
-            return await base.Register();
+            var options = new List<AdditionalOption>
+            {
+                new AdditionalOption(
+                    "year",
+                    "Year to show stats for (defaults to current year)",
+                    false,
+                    ApplicationCommandOptionType.Integer
+                )
+            };
+
+            return await base.Register(options);
         }
 
         public override async Task<bool> DoWork(SocketSlashCommand command)
@@ -42,25 +52,25 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
             try
             {
-                var year = DateTime.UtcNow.Year;
-                var logs = await GetLogsForYear(command.User.Id, year);
+                await command.DeferAsync(ephemeral: true);
+                var yearOption = command.Data.Options.FirstOrDefault(x => x.Name == "year")?.Value;
+                var year = yearOption != null ? Convert.ToInt32(yearOption) : DateTime.Now.Year;
 
+                var logs = await GetLogsForYear(command.User.Id, year);
                 if (!logs.Any())
                 {
-                    await command.RespondAsync(
-                        "No alcohol consumption logged for this year.",
-                        ephemeral: true
-                    );
+                    await command.FollowupAsync($"No alcohol logs found for year {year}.", ephemeral: true);
                     return true;
                 }
 
                 await SendStats(command, logs, year);
+                await command.FollowupAsync("Stats sent to your DM!", ephemeral: true);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in {CommandName}");
-                await command.RespondAsync(
-                    "An unexpected error occurred. Administrators have been notified.",
+                await command.FollowupAsync(
+                    "An unexpected error occurred while generating stats.",
                     ephemeral: true
                 );
             }
@@ -69,14 +79,14 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
         }
 
 
-        private async Task<List<AlkoStat>> GetLogsForYear(ulong userId, int year)
+        private async Task<List<AlkoStatEntity>> GetLogsForYear(ulong userId, int year)
         {
             return await _dbContext
                 .AlkoStats.Where(x => x.UserId == userId && x.Date.Year == year)
                 .ToListAsync();
         }
 
-        private async Task SendStats(SocketSlashCommand command, List<AlkoStat> logs, int year)
+        private async Task SendStats(SocketSlashCommand command, List<AlkoStatEntity> logs, int year)
         {
             var stats = _calculator.Calculate(logs, year);
             var embed = _calculator.BuildEmbed(
@@ -89,7 +99,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             try
             {
                 await command.User.SendMessageAsync(embed: embed);
-                await command.RespondAsync("Sent your stats via DM!", ephemeral: true);
+                await command.FollowupAsync("Sent your stats via DM!", ephemeral: true);
             }
             catch (Discord.Net.HttpException ex)
             {
@@ -97,7 +107,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                     ex,
                     $"Could not send DM to user {command.User.Username} ({command.User.Id}) in {CommandName}"
                 );
-                await command.RespondAsync(
+                await command.FollowupAsync(
                     "I couldn't send you a DM. Please check your privacy settings.",
                     ephemeral: true
                 );

@@ -1,15 +1,18 @@
+using CyberHejmiBot.Business.Common.Parsers;
 using CyberHejmiBot.Data.Entities.Alcohol;
+using AlkoStatEntity = CyberHejmiBot.Data.Entities.Alcohol.AlkoStat;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
 
-namespace CyberHejmiBot.Business.SlashCommands.Commands
+namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
 {
     public class AlkoLogCommand : BaseSlashCommandHandler<ISlashCommand>
     {
         private readonly LocalDbContext _dbContext;
         private readonly ILogger<AlkoLogCommand> _logger;
+        private readonly AlkoLogValidator _validator;
 
         public override string CommandName => "alko-log";
         public override string Description =>
@@ -18,12 +21,14 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
         public AlkoLogCommand(
             DiscordSocketClient client,
             LocalDbContext dbContext,
-            ILogger<AlkoLogCommand> logger
+            ILogger<AlkoLogCommand> logger,
+            AlkoLogValidator validator
         )
             : base(client, logger)
         {
             _dbContext = dbContext;
             _logger = logger;
+            _validator = validator;
         }
 
         public override async Task<SlashCommandProperties> Register()
@@ -60,27 +65,34 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
             try
             {
+                await command.DeferAsync(ephemeral: true);
                 var (amount, percentage, dateOption) = GetOptions(command);
 
-                var validationRes = await ValidateInterdependencies(command, amount, percentage);
-
-                if (!validationRes)
+                var validationError = _validator.ValidateInterdependencies(amount, percentage);
+                if (!string.IsNullOrEmpty(validationError))
+                {
+                    await command.FollowupAsync(validationError, ephemeral: true);
                     return true;
+                }
 
-                var dateResult = await ValidateAndParseDate(command, dateOption);
-
-                if (!dateResult.IsValid)
+                var (date, dateError) = _validator.ValidateAndParseDate(dateOption);
+                if (dateError != null)
+                {
+                    await command.FollowupAsync(dateError, ephemeral: true);
                     return true;
+                }
 
-                var date = dateResult.Date;
+                await SaveStats(command, date!.Value, amount, percentage);
 
-                await SaveStats(command, date, amount, percentage);
-
-                await SendResponse(command, amount, percentage, date);
+                await SendResponse(command, amount, percentage, date.Value);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in {CommandName}");
+                await command.FollowupAsync(
+                    "An unexpected error occurred.",
+                    ephemeral: true
+                );
             }
 
             return true;
@@ -104,57 +116,6 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             return (amount, percentage, dateOption);
         }
 
-        private async Task<bool> ValidateInterdependencies(
-            SocketSlashCommand command,
-            int? amount,
-            float? percentage
-        )
-        {
-            if (
-                (amount.HasValue && !percentage.HasValue)
-                || (!amount.HasValue && percentage.HasValue)
-            )
-            {
-                await command.RespondAsync(
-                    "❌ Validation Error: You must provide **both** 'amount' and 'percentage' if you specify one of them.",
-                    ephemeral: true
-                );
-                return false;
-            }
-            return true;
-        }
-
-        private async Task<(bool IsValid, DateTime Date)> ValidateAndParseDate(
-            SocketSlashCommand command,
-            string? dateOption
-        )
-        {
-            var date = DateTime.UtcNow.Date;
-
-            if (!string.IsNullOrEmpty(dateOption))
-            {
-                if (
-                    !DateTime.TryParseExact(
-                        dateOption,
-                        "dd-MM-yyyy",
-                        null,
-                        System.Globalization.DateTimeStyles.None,
-                        out date
-                    )
-                )
-                {
-                    await command.RespondAsync(
-                        $"❌ Validation Error: Invalid date format '{dateOption}'. Please use DD-MM-YYYY.",
-                        ephemeral: true
-                    );
-                    return (false, DateTime.MinValue);
-                }
-            }
-
-            date = DateTime.SpecifyKind(date, DateTimeKind.Utc);
-            return (true, date);
-        }
-
         private async Task SaveStats(
             SocketSlashCommand command,
             DateTime date,
@@ -162,7 +123,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             float? percentage
         )
         {
-            var entry = new AlkoStat
+            var entry = new AlkoStatEntity
             {
                 UserId = command.User.Id,
                 Date = date,
@@ -188,12 +149,17 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                     ? $"Logged {amount}ml of {percentage}% alcohol for {date:dd-MM-yyyy}."
                     : $"Logged alcohol consumption for {date:dd-MM-yyyy}.";
 
+                if (percentage.HasValue && percentage == 100)
+                {
+                    msg += " serio, 100% alko? :O";
+                }
+
                 await command.User.SendMessageAsync(msg);
-                await command.RespondAsync("Done! Check your DMs.", ephemeral: true);
+                await command.FollowupAsync("Done! Check your DMs.", ephemeral: true);
             }
             catch (Discord.Net.HttpException)
             {
-                await command.RespondAsync(
+                await command.FollowupAsync(
                     "I couldn't send you a DM. Please check your privacy settings.",
                     ephemeral: true
                 );

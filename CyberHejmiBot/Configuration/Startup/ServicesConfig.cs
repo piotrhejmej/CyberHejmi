@@ -60,7 +60,11 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<IRecurringJobsConfig, RecurringJobsConfig>()
                 .AddSingleton<ILoggerProvider, DiscordChannelLoggerProvider>()
                 .AddScoped<ITwitchChecker, TwitchChecker>()
-                .AddScoped<IAlkoStatsCalculator, AlkoStatsCalculator>();
+                .AddScoped<IAlkoStatsCalculator, AlkoStatsCalculator>()
+                .AddScoped<Business.Common.Parsers.IDateParser, Business.Common.Parsers.DateParser>()
+                .AddScoped<Business.SlashCommands.Commands.Alko.AlkoLog.AlkoLogValidator>()
+                .AddScoped<Business.SlashCommands.Commands.Alko.AlkoEntryRemove.AlkoEntryRemoveValidator>()
+                .AddScoped<Business.SlashCommands.Commands.Alko.AlkoEntryList.AlkoEntryListValidator>();
 
             collection.AddClassesAsImplementedAbstractClass(
                 Assembly.GetExecutingAssembly(),
