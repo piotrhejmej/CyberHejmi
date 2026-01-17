@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
 {
-    public class AlkoLogCommand : BaseSlashCommandHandler<ISlashCommand>
+    public class AlkoLogCommand : BaseSlashCommandHandler<ISlashCommand>, IAlkoCommand
     {
         private readonly LocalDbContext _dbContext;
         private readonly ILogger<AlkoLogCommand> _logger;
@@ -17,6 +17,30 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
         public override string CommandName => "alko-log";
         public override string Description =>
             "Log alcohol. Provide amount & percentage for details, or leave empty for generic.";
+
+        private static readonly AdditionalOption[] _options = new[]
+        {
+            new AdditionalOption(
+                "amount",
+                "Amount in ml (Required if percentage is set)",
+                false,
+                ApplicationCommandOptionType.Integer
+            ),
+            new AdditionalOption(
+                "percentage",
+                "Alcohol percentage (e.g. 5, 40) (Required if amount is set)",
+                false,
+                ApplicationCommandOptionType.Number
+            ),
+            new AdditionalOption(
+                "date",
+                "Date of consumption (DD-MM-YYYY) - Optional, defaults to today",
+                false,
+                ApplicationCommandOptionType.String
+            ),
+        };
+
+        public IReadOnlyList<AdditionalOption> Options => _options;
 
         public AlkoLogCommand(
             DiscordSocketClient client,
@@ -33,29 +57,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
 
         public override async Task<SlashCommandProperties> Register()
         {
-            var options = new List<AdditionalOption>
-            {
-                new AdditionalOption(
-                    "amount",
-                    "Amount in ml (Required if percentage is set)",
-                    false,
-                    ApplicationCommandOptionType.Integer
-                ),
-                new AdditionalOption(
-                    "percentage",
-                    "Alcohol percentage (e.g. 5, 40) (Required if amount is set)",
-                    false,
-                    ApplicationCommandOptionType.Number
-                ),
-                new AdditionalOption(
-                    "date",
-                    "Date of consumption (DD-MM-YYYY) - Optional, defaults to today",
-                    false,
-                    ApplicationCommandOptionType.String
-                ),
-            };
-
-            return await base.Register(options);
+            return await base.Register(Options);
         }
 
         public override async Task<bool> DoWork(SocketSlashCommand command)

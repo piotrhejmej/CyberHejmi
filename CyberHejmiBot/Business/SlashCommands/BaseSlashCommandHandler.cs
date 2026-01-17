@@ -24,7 +24,7 @@ namespace CyberHejmiBot.Business.SlashCommands
             return await Register(null);
         }
 
-        public virtual async Task<SlashCommandProperties> Register(ICollection<AdditionalOption>? AdditionalOptions)
+        public virtual async Task<SlashCommandProperties> Register(IEnumerable<AdditionalOption>? AdditionalOptions)
         {
             var commandBuilder = new SlashCommandBuilder()
                .WithName(CommandName)
