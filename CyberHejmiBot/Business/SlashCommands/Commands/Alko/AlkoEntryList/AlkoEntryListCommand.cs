@@ -18,16 +18,17 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
         public override string CommandName => "alko-entry-list";
         public override string Description => "Lists your alcohol log entries.";
 
-        public List<AdditionalOption> Options =>
-            new List<AdditionalOption>
-            {
-                new AdditionalOption(
-                    "page",
-                    "Page number (default 0)",
-                    false,
-                    ApplicationCommandOptionType.Integer
-                ),
-            };
+        private static readonly AdditionalOption[] _options = new[]
+        {
+            new AdditionalOption(
+                "page",
+                "Page number (default 0)",
+                false,
+                ApplicationCommandOptionType.Integer
+            )
+        };
+
+        public IReadOnlyList<AdditionalOption> Options => _options;
 
         public AlkoEntryListCommand(
             DiscordSocketClient client,

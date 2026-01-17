@@ -17,7 +17,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
         public override string CommandName => "alko-stat";
         public override string Description => "Shows alcohol statistics for the user.";
 
-        public List<AdditionalOption> Options => new List<AdditionalOption>
+        private static readonly AdditionalOption[] _options = new[]
         {
             new AdditionalOption(
                 "year",
@@ -26,6 +26,8 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
                 ApplicationCommandOptionType.Integer
             )
         };
+
+        public IReadOnlyList<AdditionalOption> Options => _options;
 
         public AlkoStatCommand(
             DiscordSocketClient client,

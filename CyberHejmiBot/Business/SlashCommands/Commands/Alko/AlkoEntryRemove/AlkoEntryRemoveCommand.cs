@@ -16,16 +16,17 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryRemove
         public override string CommandName => "alko-entry-remove";
         public override string Description => "Removes an alcohol log entry by ID.";
 
-        public List<AdditionalOption> Options =>
-            new List<AdditionalOption>
-            {
-                new AdditionalOption(
-                    "id",
-                    "The ID of the entry to remove (from list)",
-                    true,
-                    ApplicationCommandOptionType.String
-                ),
-            };
+        private static readonly AdditionalOption[] _options = new[]
+        {
+            new AdditionalOption(
+                "id",
+                "The ID of the entry to remove (from list)",
+                true,
+                ApplicationCommandOptionType.String
+            )
+        };
+
+        public IReadOnlyList<AdditionalOption> Options => _options;
 
         public AlkoEntryRemoveCommand(
             DiscordSocketClient client,

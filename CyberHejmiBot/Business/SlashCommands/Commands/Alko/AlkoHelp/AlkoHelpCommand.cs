@@ -11,7 +11,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
 
         public override string CommandName => "alko-help";
         public override string Description => "Lists available Alko commands and their parameters.";
-        public List<AdditionalOption> Options => new List<AdditionalOption>();
+        public IReadOnlyList<AdditionalOption> Options => Array.Empty<AdditionalOption>();
 
         public AlkoHelpCommand(
             DiscordSocketClient client,

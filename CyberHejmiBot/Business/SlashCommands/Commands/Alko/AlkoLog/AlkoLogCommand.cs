@@ -18,7 +18,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
         public override string Description =>
             "Log alcohol. Provide amount & percentage for details, or leave empty for generic.";
 
-        public List<AdditionalOption> Options => new List<AdditionalOption>
+        private static readonly AdditionalOption[] _options = new[]
         {
             new AdditionalOption(
                 "amount",
@@ -39,6 +39,8 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
                 ApplicationCommandOptionType.String
             ),
         };
+
+        public IReadOnlyList<AdditionalOption> Options => _options;
 
         public AlkoLogCommand(
             DiscordSocketClient client,
