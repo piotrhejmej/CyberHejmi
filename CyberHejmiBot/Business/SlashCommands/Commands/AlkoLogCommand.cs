@@ -13,7 +13,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
         public override string CommandName => "alko-log";
         public override string Description =>
-            "Logs alcohol consumption. Provide amount & percentage for specific details, or leave empty for generic.";
+            "Log alcohol. Provide amount & percentage for details, or leave empty for generic.";
 
         public AlkoLogCommand(
             DiscordSocketClient client,
