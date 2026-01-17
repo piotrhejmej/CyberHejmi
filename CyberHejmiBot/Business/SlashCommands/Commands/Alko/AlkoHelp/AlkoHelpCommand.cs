@@ -45,10 +45,10 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
                 .WithDescription("Here are the commands you can use:")
                 .WithColor(Color.Gold);
 
+            var sb = new StringBuilder();
+
             foreach (var cmd in commands)
             {
-                var sb = new StringBuilder();
-                sb.AppendLine($"### '/{cmd.Name}'");
                 sb.AppendLine($"> {cmd.Description}");
 
                 if (cmd.Options.Any())
@@ -64,8 +64,12 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
                 {
                     sb.AppendLine("*No parameters.*");
                 }
-                sb.AppendLine("\n");
-                embedBuilder.AddField($"### '/{cmd.Name}'", sb.ToString());
+
+                embedBuilder
+                    .AddField($"/{cmd.Name}", sb.ToString())
+                    .AddField("------", string.Empty);
+
+                sb.Clear();
             }
 
             try
