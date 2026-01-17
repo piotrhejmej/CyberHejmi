@@ -67,7 +67,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
 
                 embedBuilder
                     .AddField($"/{cmd.Name}", sb.ToString())
-                    .AddField(string.Empty, "---------------------");
+                    .AddField("-", "---------------------");
 
                 sb.Clear();
             }
