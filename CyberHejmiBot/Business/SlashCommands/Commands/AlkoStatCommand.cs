@@ -30,9 +30,9 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             _logger = logger;
         }
 
-        public override async Task Register()
+        public override async Task<SlashCommandProperties> Register()
         {
-            await base.Register();
+            return await base.Register();
         }
 
         public override async Task<bool> DoWork(SocketSlashCommand command)
