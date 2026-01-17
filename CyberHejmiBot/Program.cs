@@ -1,5 +1,8 @@
-﻿using CyberHejmiBot.Configuration.Hangfire;
+﻿using CyberHejmiBot.Business.Common;
+using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Configuration.Logging.Hangfire;
+using CyberHejmiBot.Configuration.Logging;
+using CyberHejmiBot.Configuration.Settings;
 using CyberHejmiBot.Configuration.Startup;
 using CyberHejmiBot.Entities;
 using Discord.WebSocket;
@@ -34,9 +37,10 @@ namespace CyberHejmiBot
                         .UseActivator(new HangfireJobActivator(services));
 
                     var discordClient = services.GetRequiredService<DiscordSocketClient>();
+                    var discordLogService = services.GetRequiredService<DiscordLogService>();
 
                     GlobalConfiguration.Configuration.UseLogProvider(
-                        new DiscordLoggerProvider(discordClient)
+                        new DiscordHangfireLogProvider(discordLogService)
                     );
 
                     // We need a background job server.

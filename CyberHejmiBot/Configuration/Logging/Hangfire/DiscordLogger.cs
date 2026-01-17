@@ -1,22 +1,15 @@
-﻿using Discord.Rest;
-using Discord.WebSocket;
+﻿using CyberHejmiBot.Business.Common;
 using Hangfire.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Configuration.Logging.Hangfire
 {
-    public class DiscordLogger : ILog
+    public class DiscordHangfireLogger : ILog
     {
-        private readonly DiscordSocketClient Client;
-        private static ulong CHANNEL_ID = 1012391792014008353;
+        private readonly DiscordLogService _service;
 
-        public DiscordLogger(DiscordSocketClient client, string name)
+        public DiscordHangfireLogger(DiscordLogService service, string name)
         {
-            Client = client;
+            _service = service;
             Name = name;
         }
 
@@ -24,51 +17,39 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
 
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception? exception = null)
         {
-            if (logLevel == LogLevel.Error)
-            {
-                if (Client.LoginState != Discord.LoginState.LoggedIn)
-                    return false;
+            var msLevel = MapLevel(logLevel);
 
-                if (Client.Rest.GetChannelAsync(CHANNEL_ID).Result is not RestTextChannel restChannel)
-                    return false;
-
-                var embedded = new Discord.EmbedBuilder()
-                    .WithColor(Discord.Color.Red)
-                    .WithTimestamp(DateTimeOffset.UtcNow);
-
-                embedded.WithTitle(messageFunc is not null ? messageFunc() : "Error");
-
-                if (exception != null)
-                {
-                    var stringBuilder = new StringBuilder();
-                    stringBuilder.AppendLine($"Exception: {exception.Message}");
-                    stringBuilder.AppendLine("---------");
-
-                    if (exception.InnerException != null) 
-                        stringBuilder.AppendLine($"Inner Exception: {exception.InnerException.Message}");
-
-                    embedded.WithDescription(stringBuilder.ToString());
-                }
-
-                restChannel.SendMessageAsync(embed: embedded.Build());
-            }
-
+            _service.Log(msLevel, messageFunc?.Invoke() ?? "", exception, $"HF: {Name}");
             return true;
+        }
+
+        private Microsoft.Extensions.Logging.LogLevel MapLevel(LogLevel hfLevel)
+        {
+            return hfLevel switch
+            {
+                LogLevel.Trace => Microsoft.Extensions.Logging.LogLevel.Trace,
+                LogLevel.Debug => Microsoft.Extensions.Logging.LogLevel.Debug,
+                LogLevel.Info => Microsoft.Extensions.Logging.LogLevel.Information,
+                LogLevel.Warn => Microsoft.Extensions.Logging.LogLevel.Warning,
+                LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
+                LogLevel.Fatal => Microsoft.Extensions.Logging.LogLevel.Critical,
+                _ => Microsoft.Extensions.Logging.LogLevel.None,
+            };
         }
     }
 
-    public class DiscordLoggerProvider : ILogProvider
+    public class DiscordHangfireLogProvider : ILogProvider
     {
-        private readonly DiscordSocketClient Client;
+        private readonly DiscordLogService _service;
 
-        public DiscordLoggerProvider(DiscordSocketClient client)
+        public DiscordHangfireLogProvider(DiscordLogService service)
         {
-            Client = client;
+            _service = service;
         }
 
         public ILog GetLogger(string name)
         {
-            return new DiscordLogger(Client, name);
+            return new DiscordHangfireLogger(_service, name);
         }
     }
 }

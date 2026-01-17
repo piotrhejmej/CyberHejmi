@@ -29,11 +29,12 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             if ((await base.DoWork(command)))
                 return false;
 
-            var rnd = new Random();
-            var widomIds = await DbContext.WisdomEntries.Select(r => r.Id).ToArrayAsync();
-            var wisdomIndex = widomIds[rnd.Next(widomIds.Length)];
+            var count = await DbContext.WisdomEntries.CountAsync();
+            if (count == 0)
+                return false;
 
-            var wisdom = DbContext.WisdomEntries.FirstOrDefault(r => r.Id == wisdomIndex);
+            var index = Random.Shared.Next(count);
+            var wisdom = await DbContext.WisdomEntries.Skip(index).Take(1).FirstOrDefaultAsync();
 
             if (wisdom is null)
                 return false;

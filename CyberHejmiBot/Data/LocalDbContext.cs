@@ -4,6 +4,7 @@ using CyberHejmiBot.Data.Entities.Facts;
 using CyberHejmiBot.Data.Entities.JobRelated;
 using CyberHejmiBot.Data.Entities.Seed;
 using CyberHejmiBot.Data.Entities.Wisdom;
+using CyberHejmiBot.Data.Entities.Karma;
 using CyberHejmiBot.Entities.Test;
 using CyberHejmiBot.Data.Entities.Alcohol;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,7 @@ namespace CyberHejmiBot.Entities
         public DbSet<WisdomEntry> WisdomEntries => Set<WisdomEntry>();
         public DbSet<FactsSubscription> FactsSubscriptions => Set<FactsSubscription>();
         public DbSet<Birthday> Birthdays => Set<Birthday>();
+        public DbSet<UserKarma> UserKarma => Set<UserKarma>();
         public DbSet<MrStreamerCheckerLogs> MrStreamerCheckerLogs => Set<MrStreamerCheckerLogs>();
         public DbSet<AlkoStat> AlkoStats => Set<AlkoStat>();
         
