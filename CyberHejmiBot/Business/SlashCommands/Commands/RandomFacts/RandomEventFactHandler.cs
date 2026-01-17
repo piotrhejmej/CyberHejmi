@@ -1,5 +1,5 @@
 ﻿using CyberHejmiBot.Business.Common;
-using CyberHejmiBot.Configuration.Loging;
+using Microsoft.Extensions.Logging;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
@@ -22,7 +22,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
         };
         private readonly IRandomFactFetcher RandomFactFetcher;
 
-        public RandomEventFactHandler(DiscordSocketClient client, ILogger logger, IRandomFactFetcher randomFactFetcher) : base(client, logger)
+        public RandomEventFactHandler(DiscordSocketClient client, ILogger<RandomEventFactHandler> logger, IRandomFactFetcher randomFactFetcher) : base(client, logger)
         {
             Client = client;
             Logger = logger;

@@ -1,10 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace CyberHejmiBot.Business.Common
 {
@@ -22,11 +22,14 @@ namespace CyberHejmiBot.Business.Common
 
     public class TwitchChecker : ITwitchChecker
     {
-        private readonly string TWITCH_CLIENT_ID = Environment.GetEnvironmentVariable("TWITCH_CLIENT_ID") ?? "";
-        private readonly string TWITCH_CLIENT_SECRET = Environment.GetEnvironmentVariable("TWITCH_CLIENT_SECRET") ?? "";
+        private readonly string TWITCH_CLIENT_ID =
+            Environment.GetEnvironmentVariable("TWITCH_CLIENT_ID") ?? "";
+        private readonly string TWITCH_CLIENT_SECRET =
+            Environment.GetEnvironmentVariable("TWITCH_CLIENT_SECRET") ?? "";
         private const string TWITCH_AUTH_API_GRANT_TYPE = "client_credentials";
         private const string TWITCH_AUTH_API_URI = "https://id.twitch.tv/oauth2/token";
-        private const string TWITCH_API_URI = "https://api.twitch.tv/helix/streams?user_login=StreamKoderka";
+        private const string TWITCH_API_URI =
+            "https://api.twitch.tv/helix/streams?user_login=StreamKoderka";
 
         public async Task<CheckerResult> IsMrStreamerOnline()
         {
@@ -36,19 +39,16 @@ namespace CyberHejmiBot.Business.Common
                 return new CheckerResult
                 {
                     IsSuccesfull = false,
-                    Error = $"Code: {clientResult.statusCode}"
+                    Error = $"Code: {clientResult.statusCode}",
                 };
 
             var response = await clientResult.httpClient.GetAsync(TWITCH_API_URI);
 
             if (!response.IsSuccessStatusCode)
             {
-                return new CheckerResult
-                {
-                    IsSuccesfull = false,
-                    Error = $"{response.StatusCode}"
-                };
-            };
+                return new CheckerResult { IsSuccesfull = false, Error = $"{response.StatusCode}" };
+            }
+            ;
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var streamResponse = JsonConvert.DeserializeObject<TwitchSteamData>(responseContent);
@@ -58,15 +58,22 @@ namespace CyberHejmiBot.Business.Common
             return new CheckerResult
             {
                 IsSuccesfull = true,
-                Result = streamResponse?.data != null && streamResponse.data.Any()
+                Result = streamResponse?.data?.Any() == true,
             };
         }
 
-        private async Task<(bool isSuccessfull, HttpClient? httpClient, HttpStatusCode? statusCode)> GetAuthorizedTwitchHttpClient()
+        private async Task<(
+            bool isSuccessfull,
+            HttpClient? httpClient,
+            HttpStatusCode? statusCode
+        )> GetAuthorizedTwitchHttpClient()
         {
             var client = new HttpClient();
 
-            var response = await client.PostAsync($"{TWITCH_AUTH_API_URI}?client_id={TWITCH_CLIENT_ID}&client_secret={TWITCH_CLIENT_SECRET}&grant_type={TWITCH_AUTH_API_GRANT_TYPE}", null);
+            var response = await client.PostAsync(
+                $"{TWITCH_AUTH_API_URI}?client_id={TWITCH_CLIENT_ID}&client_secret={TWITCH_CLIENT_SECRET}&grant_type={TWITCH_AUTH_API_GRANT_TYPE}",
+                null
+            );
 
             if (!response.IsSuccessStatusCode)
             {
@@ -84,8 +91,14 @@ namespace CyberHejmiBot.Business.Common
             client.Dispose();
             client = new HttpClient();
 
+            if (authResponse?.access_token is null)
+                return (false, null, null);
+
             client.BaseAddress = new Uri(TWITCH_API_URI);
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authResponse.access_token}");
+            client.DefaultRequestHeaders.Add(
+                "Authorization",
+                $"Bearer {authResponse.access_token}"
+            );
             client.DefaultRequestHeaders.Add("Client-Id", TWITCH_CLIENT_ID);
 
             return (true, client, null);

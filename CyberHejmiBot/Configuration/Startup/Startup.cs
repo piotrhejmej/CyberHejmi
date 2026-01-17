@@ -1,7 +1,7 @@
 ﻿using CyberHejmiBot.Business.Events;
 using CyberHejmiBot.Business.SlashCommands;
 using CyberHejmiBot.Business.TextCommands;
-using CyberHejmiBot.Configuration.Loging;
+using Microsoft.Extensions.Logging;
 using Discord;
 using Discord.WebSocket;
 
@@ -12,19 +12,21 @@ namespace CyberHejmiBot.Configuration.Startup
         Task Init();
     }
 
-    internal class Startup: IStartup
+    internal class Startup : IStartup
     {
         private readonly DiscordSocketClient Client;
         private readonly TextCommandHandler CommandHandler;
-        private readonly ILogger Logger;
+        private readonly ILogger<Startup> Logger;
         private readonly IEventListener EventListener;
         private readonly ISlashCommandsConfig SlashCommandsConfig;
 
-        public Startup(DiscordSocketClient client,
-                       TextCommandHandler commandHandler,
-                       ILogger logger,
-                       IEventListener eventListener,
-                       ISlashCommandsConfig slashCommandsConfig)
+        public Startup(
+            DiscordSocketClient client,
+            TextCommandHandler commandHandler,
+            ILogger<Startup> logger,
+            IEventListener eventListener,
+            ISlashCommandsConfig slashCommandsConfig
+        )
         {
             Client = client;
             CommandHandler = commandHandler;
@@ -39,7 +41,34 @@ namespace CyberHejmiBot.Configuration.Startup
             await Client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BOT_TOKEN"));
             await Client.StartAsync();
             Client.Ready += Ready;
-            Client.Log += Logger.Log;
+            Client.Log += LogAsync;
+        }
+
+        private Task LogAsync(LogMessage container)
+        {
+            switch (container.Severity)
+            {
+                case LogSeverity.Critical:
+                    Logger.LogCritical(container.Exception, container.Message);
+                    break;
+                case LogSeverity.Error:
+                    Logger.LogError(container.Exception, container.Message);
+                    break;
+                case LogSeverity.Warning:
+                    Logger.LogWarning(container.Exception, container.Message);
+                    break;
+                case LogSeverity.Info:
+                    Logger.LogInformation(container.Exception, container.Message);
+                    break;
+                case LogSeverity.Verbose:
+                    Logger.LogDebug(container.Exception, container.Message);
+                    break;
+                case LogSeverity.Debug:
+                    Logger.LogDebug(container.Exception, container.Message);
+                    break;
+            }
+
+            return Task.CompletedTask;
         }
 
         public async Task Ready()

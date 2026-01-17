@@ -1,4 +1,4 @@
-using CyberHejmiBot.Configuration.Logging.DebugLogger;
+using Microsoft.Extensions.Logging;
 using CyberHejmiBot.Data.Entities.Karma;
 using CyberHejmiBot.Entities;
 using Discord;
@@ -14,9 +14,9 @@ namespace CyberHejmiBot.Business.Events.Karma
     {
         private readonly DiscordSocketClient _client;
         private readonly LocalDbContext _dbContext;
-        private readonly IDebugLogger _logger;
+        private readonly ILogger<KarmaEventListener> _logger;
 
-        public KarmaEventListener(DiscordSocketClient client, LocalDbContext dbContext, IDebugLogger logger)
+        public KarmaEventListener(DiscordSocketClient client, LocalDbContext dbContext, ILogger<KarmaEventListener> logger)
         {
             _client = client;
             _dbContext = dbContext;

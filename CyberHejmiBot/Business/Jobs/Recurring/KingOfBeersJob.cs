@@ -1,5 +1,5 @@
 using CyberHejmiBot.Business.Common;
-using CyberHejmiBot.Configuration.Logging.DebugLogger;
+using Microsoft.Extensions.Logging;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.Rest;
@@ -19,9 +19,9 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
     {
         private readonly DiscordSocketClient _client;
         private readonly LocalDbContext _dbContext;
-        private readonly IDebugLogger _logger;
+        private readonly ILogger<KingOfBeersJob> _logger;
 
-        public KingOfBeersJob(DiscordSocketClient client, LocalDbContext dbContext, IDebugLogger logger)
+        public KingOfBeersJob(DiscordSocketClient client, LocalDbContext dbContext, ILogger<KingOfBeersJob> logger)
         {
             _client = client;
             _dbContext = dbContext;
@@ -79,7 +79,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 await _dbContext.Database.ExecuteSqlRawAsync($"DELETE FROM \"{nameof(_dbContext.UserKarma)}\" WHERE \"GuildId\" = {{0}}", channel.GuildId);
             }
             
-            _logger.LogInfo("KingOfBeersJob: Completed.");
+            _logger.LogInformation("KingOfBeersJob: Completed.");
         }
 
         private async Task<string> GetRandomGifUrl()
@@ -108,7 +108,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error fetching GIF from Tenor", ex);
+                _logger.LogError(ex, "Error fetching GIF from Tenor");
             }
 
             // Fallback to local files

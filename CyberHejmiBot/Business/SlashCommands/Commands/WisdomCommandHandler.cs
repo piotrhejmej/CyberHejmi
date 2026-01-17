@@ -1,4 +1,4 @@
-﻿using CyberHejmiBot.Configuration.Loging;
+﻿using Microsoft.Extensions.Logging;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;
@@ -17,7 +17,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
         override public string Description => "Returns highly motivational and extremely wise quote from one of the greatest minds of human history";
         private readonly LocalDbContext DbContext;
 
-        public WisdomCommandHandler(DiscordSocketClient client, ILogger logger, LocalDbContext dbContext): base (client, logger)
+        public WisdomCommandHandler(DiscordSocketClient client, ILogger<WisdomCommandHandler> logger, LocalDbContext dbContext): base (client, logger)
         {
             Client = client;
             Logger = logger;

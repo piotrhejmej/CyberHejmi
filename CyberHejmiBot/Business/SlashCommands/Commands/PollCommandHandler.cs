@@ -1,4 +1,4 @@
-﻿using CyberHejmiBot.Configuration.Loging;
+﻿using Microsoft.Extensions.Logging;
 using Discord.WebSocket;
 using System;
 using System.Collections.Generic;
@@ -11,7 +11,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
     internal class PollCommandHandler : BaseSlashCommandHandler<ISlashCommand>
     {
-        public PollCommandHandler(DiscordSocketClient client, ILogger logger) : base(client, logger)
+        public PollCommandHandler(DiscordSocketClient client, ILogger<PollCommandHandler> logger) : base(client, logger)
         {
         }
 

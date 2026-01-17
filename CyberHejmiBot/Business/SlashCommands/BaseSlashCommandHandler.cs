@@ -1,4 +1,4 @@
-﻿using CyberHejmiBot.Configuration.Loging;
+﻿using Microsoft.Extensions.Logging;
 using Discord;
 using Discord.WebSocket;
 using System;
@@ -55,7 +55,7 @@ namespace CyberHejmiBot.Business.SlashCommands
             }
             catch (Exception ex)
             {
-                await Logger.Log(new LogMessage(LogSeverity.Error, ex.Source, ex.Message, ex));
+                Logger.LogError(ex, "Error registering command");
             }
         }
 

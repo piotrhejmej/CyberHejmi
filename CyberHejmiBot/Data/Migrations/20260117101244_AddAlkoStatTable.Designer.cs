@@ -3,6 +3,7 @@ using System;
 using CyberHejmiBot.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CyberHejmiBot.Entities.Migrations
 {
     [DbContext(typeof(LocalDbContext))]
-    partial class LocalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260117101244_AddAlkoStatTable")]
+    partial class AddAlkoStatTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -111,23 +113,6 @@ namespace CyberHejmiBot.Entities.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MrStreamerCheckerLogs");
-                });
-
-            modelBuilder.Entity("CyberHejmiBot.Data.Entities.Karma.UserKarma", b =>
-                {
-                    b.Property<decimal>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<decimal>("GuildId")
-                        .HasColumnType("numeric(20,0)");
-
-                    b.Property<int>("Points")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId");
-
-                    b.ToTable("UserKarma");
                 });
 
             modelBuilder.Entity("CyberHejmiBot.Data.Entities.Wisdom.WisdomEntry", b =>

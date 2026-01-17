@@ -1,6 +1,7 @@
 ﻿using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Configuration.Logging.Hangfire;
+using CyberHejmiBot.Configuration.Logging;
 using CyberHejmiBot.Configuration.Settings;
 using CyberHejmiBot.Configuration.Startup;
 using CyberHejmiBot.Entities;
@@ -9,49 +10,75 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace CyberHejmiBot
 {
     public class Program
     {
-        static void Main()
-            => Program.RunAsync().GetAwaiter().GetResult();
-
-        public static async Task RunAsync()
+        public static async Task Main(string[] args)
         {
-            using var services = ServicesConfig.CreateProvider();
-            GlobalConfiguration.Configuration
-                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-                .UseColouredConsoleLogProvider()
-                .UseSimpleAssemblyNameTypeSerializer()
-                .UseRecommendedSerializerSettings()
-                .UsePostgreSqlStorage(Environment.GetEnvironmentVariable("Db_ConnectionString"))
-                .UseActivator(new HangfireJobActivator(services));
+            var host = CreateHostBuilder(args).Build();
 
-            var discordClient = services.GetService<DiscordSocketClient>();
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    // Initialize Hangfire Config - this was previously in RunAsync
+                    GlobalConfiguration
+                        .Configuration.SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                        .UseColouredConsoleLogProvider()
+                        .UseSimpleAssemblyNameTypeSerializer()
+                        .UseRecommendedSerializerSettings()
+                        .UsePostgreSqlStorage(
+                            Environment.GetEnvironmentVariable("Db_ConnectionString")
+                        )
+                        .UseActivator(new HangfireJobActivator(services));
 
-            if (discordClient is null)
-                throw new InvalidOperationException("DiscordSocketClient is not registered in services.");
+                    var discordClient = services.GetRequiredService<DiscordSocketClient>();
+                    var discordLogService = services.GetRequiredService<DiscordLogService>();
 
-            var logService = services.GetRequiredService<DiscordLogService>();
+                    GlobalConfiguration.Configuration.UseLogProvider(
+                        new DiscordHangfireLogProvider(discordLogService)
+                    );
 
-            GlobalConfiguration.Configuration
-                .UseLogProvider(new DiscordHangfireLogProvider(logService));
+                    // We need a background job server.
+                    // In a console app with Host.Run, usually services are hosted services.
+                    // But here we are manually managing it for now to match legacy behavior or use Using.
+                    // However, 'using var server' inside Main means it disposes when Main exits.
+                    // 'host.Run()' blocks until shutdown.
 
-            using var server = new BackgroundJobServer();
+                    using var server = new BackgroundJobServer();
 
-            var dbContext = services.GetRequiredService<LocalDbContext>();
+                    var dbContext = services.GetRequiredService<LocalDbContext>();
+                    dbContext.Database.Migrate();
+                    dbContext.Seed();
 
-            dbContext.Database.Migrate();
-            dbContext.Seed();
+                    var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
+                    recurringJobsConfig.RegisterJobs();
 
-            var recurringJobsConfig = services.GetRequiredService<IRecurringJobsConfig>();
-            recurringJobsConfig.RegisterJobs();
+                    var startup = services.GetRequiredService<IStartup>();
+                    await startup.Init();
 
-            var startup = services.GetRequiredService<IStartup>();
-            await startup.Init();
-
-            await Task.Delay(-1);
+                    // Run the host (blocks)
+                    await host.RunAsync();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred during startup: {ex.Message}");
+                    throw;
+                }
+            }
         }
+
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureServices(
+                    (hostContext, services) =>
+                    {
+                        ServicesConfig.Register(services);
+                    }
+                );
     }
 }

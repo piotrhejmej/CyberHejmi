@@ -6,19 +6,20 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
     public class DiscordHangfireLogger : ILog
     {
         private readonly DiscordLogService _service;
-        private readonly string _name;
 
         public DiscordHangfireLogger(DiscordLogService service, string name)
         {
             _service = service;
-            _name = name;
+            Name = name;
         }
+
+        public string Name { get; set; }
 
         public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception? exception = null)
         {
             var msLevel = MapLevel(logLevel);
 
-            _service.Log(msLevel, messageFunc?.Invoke() ?? "", exception, $"HF: {_name}");
+            _service.Log(msLevel, messageFunc?.Invoke() ?? "", exception, $"HF: {Name}");
             return true;
         }
 
@@ -32,7 +33,7 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
                 LogLevel.Warn => Microsoft.Extensions.Logging.LogLevel.Warning,
                 LogLevel.Error => Microsoft.Extensions.Logging.LogLevel.Error,
                 LogLevel.Fatal => Microsoft.Extensions.Logging.LogLevel.Critical,
-                _ => Microsoft.Extensions.Logging.LogLevel.None
+                _ => Microsoft.Extensions.Logging.LogLevel.None,
             };
         }
     }

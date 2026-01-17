@@ -1,5 +1,9 @@
-﻿using CyberHejmiBot.Business.Common;
-using CyberHejmiBot.Configuration.Logging.DebugLogger;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Data.Entities.Birthdays;
 using CyberHejmiBot.Data.Entities.Facts;
 using CyberHejmiBot.Entities;
@@ -7,11 +11,7 @@ using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using Hangfire;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.Jobs.Recurring
 {
@@ -19,9 +19,13 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
     {
         private readonly DiscordSocketClient Client;
         private readonly LocalDbContext DbContext;
-        private readonly IDebugLogger Logger;
+        private readonly ILogger<RandomFactProviderJob> Logger;
 
-        public RandomFactProviderJob(DiscordSocketClient client, LocalDbContext dbContext, IDebugLogger logger)
+        public RandomFactProviderJob(
+            DiscordSocketClient client,
+            LocalDbContext dbContext,
+            ILogger<RandomFactProviderJob> logger
+        )
         {
             Client = client;
             DbContext = dbContext;
@@ -39,9 +43,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
 
         public async Task DoWork()
         {
-            var subscriptions = DbContext
-                .FactsSubscriptions
-                .ToList();
+            var subscriptions = DbContext.FactsSubscriptions.ToList();
 
             foreach (var subscription in subscriptions)
             {
@@ -55,33 +57,40 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
             var today = DateTime.UtcNow;
 
             var jubilees = DbContext
-                .Birthdays
-                .Where(b => b.GuildId == subscription.GuildId)
+                .Birthdays.Where(b => b.GuildId == subscription.GuildId)
                 .Where(r => r.Date.Month == today.Month && r.Date.Day == today.Day)
                 .ToList();
 
-            Logger.LogInfo("BirthdayOverride", new Exception($"Found {jubilees.Count} jubilees for guild {subscription.GuildId}."));   
-            
+            Logger.LogInformation(
+                $"BirthdayOverride: Found {jubilees.Count} jubilees for guild {subscription.GuildId}."
+            );
+
             if (jubilees.Any())
             {
-                if (await Client
-                        .Rest
-                        .GetChannelAsync(subscription.ChannelId) is not RestTextChannel restChannel)
+                if (
+                    await Client.Rest.GetChannelAsync(subscription.ChannelId)
+                    is not RestTextChannel restChannel
+                )
                     return false;
 
-                var description = $"**{String.Join(" i ", jubilees.Select(r => $"{r.Name} obchodzi {today.Year - r.Date.Year}"))} urodziny!** z tej okazji życzymy:\nStooo lat, stooo lat, niech żyje cumpel nam! \nI jeszcze jeden i jeszcze raz!\nPrzez ręce Maaaaaryiiiiii\nSto lat, sto lat, sto lat, sto lat niech żyje nam\n A KTO??";
+                var description =
+                    $"**{String.Join(" i ", jubilees.Select(r => $"{r.Name} obchodzi {today.Year - r.Date.Year}"))} urodziny!** z tej okazji życzymy:\nStooo lat, stooo lat, niech żyje cumpel nam! \nI jeszcze jeden i jeszcze raz!\nPrzez ręce Maaaaaryiiiiii\nSto lat, sto lat, sto lat, sto lat niech żyje nam\n A KTO??";
 
-                description = jubilees.Any(r => r.HasCusomDescription) ?
-                    jubilees.First(r => r.HasCusomDescription).CustomDescription :
-                    description;
+                description = jubilees.Any(r => r.HasCusomDescription)
+                    ? jubilees.First(r => r.HasCusomDescription).CustomDescription
+                    : description;
 
                 var embedBuilder = new EmbedBuilder()
                 {
-                    ImageUrl = jubilees.Any(r => r.HasCusomDescription) ? null : "https://media.tenor.com/dM2Tdvd4gsEAAAAC/wszystkiego-najlepszego.gif",
+                    ImageUrl = jubilees.Any(r => r.HasCusomDescription)
+                        ? null
+                        : "https://media.tenor.com/dM2Tdvd4gsEAAAAC/wszystkiego-najlepszego.gif",
                 }
-                .WithColor(Color.Gold)
-                .WithTitle($"On this day in {String.Join(" and ", jubilees.Select(r => r.Date.Year))}:")
-                .WithDescription(description);
+                    .WithColor(Color.Gold)
+                    .WithTitle(
+                        $"On this day in {String.Join(" and ", jubilees.Select(r => r.Date.Year))}:"
+                    )
+                    .WithDescription(description);
 
                 await restChannel.SendMessageAsync(embed: embedBuilder.Build());
 
