@@ -18,7 +18,8 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
         private readonly ILogger<AlkoLogCommand> _logger;
 
         public override string CommandName => "alko-log";
-        public override string Description => "Logs alcohol consumption. Provide amount & percentage for specific details, or leave empty for generic.";
+        public override string Description =>
+            "Logs alcohol consumption. Provide amount & percentage for specific details, or leave empty for generic.";
 
         public AlkoLogCommand(
             DiscordSocketClient client,
@@ -67,10 +68,16 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             {
                 var (amount, percentage, dateOption) = GetOptions(command);
 
-                if (!ValidateInterdependencies(command, amount, percentage).Result) return true;
+                var validationRes = await ValidateInterdependencies(command, amount, percentage);
+
+                if (!validationRes)
+                    return true;
 
                 var dateResult = await ValidateAndParseDate(command, dateOption);
-                if (!dateResult.IsValid) return true;
+
+                if (!dateResult.IsValid)
+                    return true;
+
                 var date = dateResult.Date;
 
                 await SaveStats(command, date, amount, percentage);
@@ -80,46 +87,73 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in {CommandName}");
-                await command.RespondAsync(
-                    "An unexpected error occurred.",
-                    ephemeral: true
-                );
+                await command.RespondAsync("An unexpected error occurred.", ephemeral: true);
             }
 
             return true;
         }
 
-        private (int? amount, float? percentage, string? dateOption) GetOptions(SocketSlashCommand command)
+        private (int? amount, float? percentage, string? dateOption) GetOptions(
+            SocketSlashCommand command
+        )
         {
             var amountOption = command.Data.Options.FirstOrDefault(x => x.Name == "amount")?.Value;
-            var percentageOption = command.Data.Options.FirstOrDefault(x => x.Name == "percentage")?.Value;
-            var dateOption = command.Data.Options.FirstOrDefault(x => x.Name == "date")?.Value as string;
+            var percentageOption = command
+                .Data.Options.FirstOrDefault(x => x.Name == "percentage")
+                ?.Value;
+            var dateOption =
+                command.Data.Options.FirstOrDefault(x => x.Name == "date")?.Value as string;
 
             int? amount = amountOption != null ? Convert.ToInt32(amountOption) : null;
-            float? percentage = percentageOption != null ? Convert.ToSingle(percentageOption) : null;
+            float? percentage =
+                percentageOption != null ? Convert.ToSingle(percentageOption) : null;
 
             return (amount, percentage, dateOption);
         }
 
-        private async Task<bool> ValidateInterdependencies(SocketSlashCommand command, int? amount, float? percentage)
+        private async Task<bool> ValidateInterdependencies(
+            SocketSlashCommand command,
+            int? amount,
+            float? percentage
+        )
         {
-            if ((amount.HasValue && !percentage.HasValue) || (!amount.HasValue && percentage.HasValue))
+            if (
+                (amount.HasValue && !percentage.HasValue)
+                || (!amount.HasValue && percentage.HasValue)
+            )
             {
-                await command.RespondAsync("❌ Validation Error: You must provide **both** 'amount' and 'percentage' if you specify one of them.", ephemeral: true);
+                await command.RespondAsync(
+                    "❌ Validation Error: You must provide **both** 'amount' and 'percentage' if you specify one of them.",
+                    ephemeral: true
+                );
                 return false;
             }
             return true;
         }
 
-        private async Task<(bool IsValid, DateTime Date)> ValidateAndParseDate(SocketSlashCommand command, string? dateOption)
+        private async Task<(bool IsValid, DateTime Date)> ValidateAndParseDate(
+            SocketSlashCommand command,
+            string? dateOption
+        )
         {
             var date = DateTime.UtcNow.Date;
 
             if (!string.IsNullOrEmpty(dateOption))
             {
-                if (!DateTime.TryParseExact(dateOption, "dd-MM-yyyy", null, System.Globalization.DateTimeStyles.None, out date))
+                if (
+                    !DateTime.TryParseExact(
+                        dateOption,
+                        "dd-MM-yyyy",
+                        null,
+                        System.Globalization.DateTimeStyles.None,
+                        out date
+                    )
+                )
                 {
-                    await command.RespondAsync($"❌ Validation Error: Invalid date format '{dateOption}'. Please use DD-MM-YYYY.", ephemeral: true);
+                    await command.RespondAsync(
+                        $"❌ Validation Error: Invalid date format '{dateOption}'. Please use DD-MM-YYYY.",
+                        ephemeral: true
+                    );
                     return (false, default);
                 }
             }
@@ -128,7 +162,12 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             return (true, date);
         }
 
-        private async Task SaveStats(SocketSlashCommand command, DateTime date, int? amount, float? percentage)
+        private async Task SaveStats(
+            SocketSlashCommand command,
+            DateTime date,
+            int? amount,
+            float? percentage
+        )
         {
             var entry = new AlkoStat
             {
@@ -143,7 +182,12 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             await _dbContext.SaveChangesAsync();
         }
 
-        private async Task SendResponse(SocketSlashCommand command, int? amount, float? percentage, DateTime date)
+        private async Task SendResponse(
+            SocketSlashCommand command,
+            int? amount,
+            float? percentage,
+            DateTime date
+        )
         {
             try
             {
@@ -160,6 +204,8 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                     "I couldn't send you a DM. Please check your privacy settings.",
                     ephemeral: true
                 );
+
+                throw;
             }
         }
     }
