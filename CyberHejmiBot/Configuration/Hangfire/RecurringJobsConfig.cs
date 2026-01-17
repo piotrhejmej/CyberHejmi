@@ -1,10 +1,4 @@
 ﻿using CyberHejmiBot.Business.Jobs.Recurring;
-using Hangfire;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Configuration.Hangfire
 {
@@ -13,7 +7,7 @@ namespace CyberHejmiBot.Configuration.Hangfire
         void RegisterJobs();
     }
 
-    public class RecurringJobsConfig: IRecurringJobsConfig
+    public class RecurringJobsConfig : IRecurringJobsConfig
     {
         private readonly IEnumerable<IReccurringJob> RecurringJobs;
 

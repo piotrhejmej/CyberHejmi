@@ -1,13 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CyberHejmiBot.Business.SlashCommands;
 using CyberHejmiBot.Data.Entities.Alcohol;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands
@@ -19,7 +13,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
 
         public override string CommandName => "alko-log";
         public override string Description =>
-            "Logs alcohol consumption. Provide amount & percentage for specific details, or leave empty for generic.";
+            "Log alcohol. Provide amount & percentage for details, or leave empty for generic.";
 
         public AlkoLogCommand(
             DiscordSocketClient client,

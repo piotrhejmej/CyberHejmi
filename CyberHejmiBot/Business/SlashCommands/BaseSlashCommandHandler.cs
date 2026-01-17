@@ -1,17 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using Discord;
+﻿using Discord;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.SlashCommands
 {
     public record AdditionalOption(string OptionName, string Description, bool IsRequired, ApplicationCommandOptionType Type);
 
-    public abstract class BaseSlashCommandHandler<T> where T: ISlashCommand
+    public abstract class BaseSlashCommandHandler<T> where T : ISlashCommand
     {
         public abstract string CommandName { get; }
         public abstract string Description { get; }
@@ -41,7 +36,7 @@ namespace CyberHejmiBot.Business.SlashCommands
                     .ToList()
                     .ForEach(option =>
                     {
-                        commandBuilder.AddOption(option.OptionName, 
+                        commandBuilder.AddOption(option.OptionName,
                             option.Type,
                             option.Description,
                             option.IsRequired);

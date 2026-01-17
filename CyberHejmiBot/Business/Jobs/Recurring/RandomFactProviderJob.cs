@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CyberHejmiBot.Business.Common;
-using CyberHejmiBot.Data.Entities.Birthdays;
-using CyberHejmiBot.Data.Entities.Facts;
+﻿using CyberHejmiBot.Data.Entities.Facts;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.Rest;

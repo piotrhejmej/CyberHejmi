@@ -3,13 +3,7 @@ using CyberHejmiBot.Entities;
 using CyberHejmiBot.Static;
 using Discord;
 using Discord.Commands;
-using Discord.Rest;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.SuperSpecial
 {
@@ -70,7 +64,7 @@ namespace CyberHejmiBot.Business.SuperSpecial
             if ((message.HasCharPrefix('!', ref argPos) ||
                 message.HasMentionPrefix(Client.CurrentUser, ref argPos)) ||
                 message.Author.IsBot)
-                    return;
+                return;
 
             await DbContext.AddAsync(new WisdomEntry()
             {

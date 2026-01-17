@@ -1,11 +1,5 @@
 ﻿using CyberHejmiBot.Data.Entities.Birthdays;
 using CyberHejmiBot.Entities;
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Data.Entities.Seed
 {//700750367436046409
@@ -15,7 +9,7 @@ namespace CyberHejmiBot.Data.Entities.Seed
         {
             dbContext.RemoveRange(dbContext.Birthdays);
 
-            var birthdays = new List<Birthday>() 
+            var birthdays = new List<Birthday>()
             {
                 new Birthday(700750367436046409, "Bartłomiej Gołąbek", new DateTime(1993, 10, 28, 0, 0, 0, DateTimeKind.Utc)),
                 new Birthday(700750367436046409, "Szymon Niemiec", new DateTime(1993, 1, 14, 0, 0, 0, DateTimeKind.Utc)),

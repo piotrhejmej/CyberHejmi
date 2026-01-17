@@ -1,14 +1,6 @@
-﻿using CyberHejmiBot.Configuration.Hangfire;
-using Discord;
-using Discord.Rest;
+﻿using Discord;
 using Discord.WebSocket;
-using Hangfire;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.Events.GuildEvents.GuildEventCreatedScope
 {

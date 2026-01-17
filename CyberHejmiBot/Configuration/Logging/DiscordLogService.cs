@@ -1,8 +1,8 @@
-﻿using CyberHejmiBot.Configuration.Settings;
+﻿using System.Text;
+using CyberHejmiBot.Configuration.Settings;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
-using System.Text;
 
 namespace CyberHejmiBot.Business.Common
 {
@@ -21,13 +21,13 @@ namespace CyberHejmiBot.Business.Common
         {
             PrintToConsole(logLevel, message, exception, source);
 
-            if (logLevel < LogLevel.Warning) 
+            if (logLevel < LogLevel.Warning)
                 return;
 
-            if (_client.LoginState != LoginState.LoggedIn) 
+            if (_client.LoginState != LoginState.LoggedIn)
                 return;
 
-            if (_client.GetChannel(_logChannelId) is not IMessageChannel channel) 
+            if (_client.GetChannel(_logChannelId) is not IMessageChannel channel)
                 return;
 
             var embed = BuildEmbed(logLevel, message, exception, source);
@@ -35,7 +35,7 @@ namespace CyberHejmiBot.Business.Common
             _ = Task.Run(async () =>
             {
                 try { await channel.SendMessageAsync(embed: embed); }
-                catch {}
+                catch { }
             });
         }
 

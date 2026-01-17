@@ -1,9 +1,4 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using CyberHejmiBot.Business.Common.Calculators;
-using CyberHejmiBot.Business.Jobs.Recurring;
-using CyberHejmiBot.Data.Entities.Alcohol;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;

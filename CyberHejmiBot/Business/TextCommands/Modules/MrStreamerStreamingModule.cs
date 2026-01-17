@@ -4,7 +4,7 @@ using Discord.Commands;
 namespace CyberHejmiBot.Business.TextCommands.Modules
 {
     [Group("czy")]
-    public class MrStreamerStreamingModule: ModuleBase<SocketCommandContext>
+    public class MrStreamerStreamingModule : ModuleBase<SocketCommandContext>
     {
         private readonly ITwitchChecker _twitchChecker;
 
@@ -16,11 +16,12 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
 
         [Command("szymek streamuje?")]
         [Summary("Sprawdza czy Szymek streamuje")]
-        public async Task IsStreaming() 
-        { 
+        public async Task IsStreaming()
+        {
             var isMrStreamerOnline = await _twitchChecker.IsMrStreamerOnline();
 
-            if (!isMrStreamerOnline.IsSuccesfull) {
+            if (!isMrStreamerOnline.IsSuccesfull)
+            {
                 await ReplyAsync("błund");
                 await ReplyAsync(isMrStreamerOnline.Error);
                 return;
@@ -36,7 +37,7 @@ namespace CyberHejmiBot.Business.TextCommands.Modules
                 .WithColor(Discord.Color.Gold)
                 .WithTitle("ej bo Szymek streamuje");
 
-                await ReplyAsync(embed: embedded.Build());  
+                await ReplyAsync(embed: embedded.Build());
             }
             else
             {

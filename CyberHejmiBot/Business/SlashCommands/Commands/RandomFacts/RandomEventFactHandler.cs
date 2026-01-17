@@ -1,13 +1,7 @@
 ﻿using CyberHejmiBot.Business.Common;
-using Microsoft.Extensions.Logging;
 using Discord;
-using Discord.Rest;
 using Discord.WebSocket;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
 {
