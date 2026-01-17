@@ -1,10 +1,10 @@
 using CyberHejmiBot.Business.Common.Parsers;
 using CyberHejmiBot.Data.Entities.Alcohol;
-using AlkoStatEntity = CyberHejmiBot.Data.Entities.Alcohol.AlkoStat;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.Extensions.Logging;
+using AlkoStatEntity = CyberHejmiBot.Data.Entities.Alcohol.AlkoStat;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
 {
@@ -91,10 +91,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in {CommandName}");
-                await command.FollowupAsync(
-                    "An unexpected error occurred.",
-                    ephemeral: true
-                );
+                await command.FollowupAsync("An unexpected error occurred.", ephemeral: true);
             }
 
             return true;

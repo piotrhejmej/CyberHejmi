@@ -1,13 +1,16 @@
 using System.Text;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
 {
     public class AlkoHelpCommand : BaseSlashCommandHandler<ISlashCommand>, IAlkoCommand
     {
-        private readonly IEnumerable<BaseSlashCommandHandler<ISlashCommand>> _commands;
+        private readonly IServiceProvider _serviceProvider;
+        private static List<AlkoCommandInfo>? _cachedCommands;
+        private static readonly object _lock = new();
 
         public override string CommandName => "alko-help";
         public override string Description => "Lists available Alko commands and their parameters.";
@@ -16,11 +19,11 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
         public AlkoHelpCommand(
             DiscordSocketClient client,
             ILogger<AlkoHelpCommand> logger,
-            IEnumerable<BaseSlashCommandHandler<ISlashCommand>> commands
+            IServiceProvider serviceProvider
         )
             : base(client, logger)
         {
-            _commands = commands;
+            _serviceProvider = serviceProvider;
         }
 
         public override async Task<SlashCommandProperties> Register()
@@ -35,19 +38,18 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
 
             await command.DeferAsync(ephemeral: true);
 
+            var commands = GetOrLoadCommands();
             var sb = new StringBuilder();
             sb.AppendLine("## 🍺 Alko-Tracker Helpers 🍺");
             sb.AppendLine("Here are the commands you can use:");
             sb.AppendLine();
 
-            var alkoCommands = _commands.OfType<IAlkoCommand>().ToList();
-
-            foreach (var cmd in alkoCommands)
+            foreach (var cmd in commands)
             {
-                sb.AppendLine($"### `/{cmd.CommandName}`");
+                sb.AppendLine($"### `/{cmd.Name}`");
                 sb.AppendLine($"> {cmd.Description}");
 
-                if (cmd.Options != null && cmd.Options.Any())
+                if (cmd.Options.Any())
                 {
                     sb.AppendLine("**Parameters:**");
                     foreach (var opt in cmd.Options)
@@ -66,5 +68,36 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
             await command.FollowupAsync(sb.ToString(), ephemeral: true);
             return true;
         }
+
+        private List<AlkoCommandInfo> GetOrLoadCommands()
+        {
+            if (_cachedCommands != null)
+                return _cachedCommands;
+
+            // Build the command list outside the lock to avoid creating a service scope within the critical section.
+            List<AlkoCommandInfo> commands;
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var registeredCommands = scope.ServiceProvider.GetRequiredService<
+                    IEnumerable<BaseSlashCommandHandler<ISlashCommand>>
+                >();
+                commands = registeredCommands
+                    .OfType<IAlkoCommand>()
+                    .Select(x => new AlkoCommandInfo(x.CommandName, x.Description, x.Options))
+                    .ToList();
+            }
+
+            lock (_lock)
+            {
+                if (_cachedCommands == null)
+                {
+                    _cachedCommands = commands;
+                }
+            }
+
+            return _cachedCommands;
+        }
+
+        private record AlkoCommandInfo(string Name, string Description, IReadOnlyList<AdditionalOption> Options);
     }
 }
