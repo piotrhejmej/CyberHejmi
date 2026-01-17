@@ -18,13 +18,15 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoEntryList
                 return false;
             }
 
-            if (pageOption > int.MaxValue)
+            try
+            {
+                page = checked((int)pageOption.Value);
+            }
+            catch (OverflowException)
             {
                 error = "❌ Page number is too large.";
                 return false;
             }
-
-            page = (int)pageOption;
             return true;
         }
     }

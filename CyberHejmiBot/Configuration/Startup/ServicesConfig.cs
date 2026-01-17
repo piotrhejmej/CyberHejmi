@@ -64,7 +64,8 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddScoped<Business.Common.Parsers.IDateParser, Business.Common.Parsers.DateParser>()
                 .AddScoped<Business.SlashCommands.Commands.Alko.AlkoLog.AlkoLogValidator>()
                 .AddScoped<Business.SlashCommands.Commands.Alko.AlkoEntryRemove.AlkoEntryRemoveValidator>()
-                .AddScoped<Business.SlashCommands.Commands.Alko.AlkoEntryList.AlkoEntryListValidator>();
+                .AddScoped<Business.SlashCommands.Commands.Alko.AlkoEntryList.AlkoEntryListValidator>()
+                .AddScoped<Business.SlashCommands.Commands.Alko.AlkoStat.AlkoStatValidator>();
 
             collection.AddClassesAsImplementedAbstractClass(
                 Assembly.GetExecutingAssembly(),

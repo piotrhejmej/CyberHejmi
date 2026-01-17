@@ -12,20 +12,30 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
         }
 
         public string? ValidateInterdependencies(
-            int? amount,
+            long? amountOption,
             float? percentage
         )
         {
             if (
-                (amount.HasValue && !percentage.HasValue)
-                || (!amount.HasValue && percentage.HasValue)
+                (amountOption.HasValue && !percentage.HasValue)
+                || (!amountOption.HasValue && percentage.HasValue)
             )
             {
                 return "❌ Validation Error: You must provide **both** 'amount' and 'percentage' if you specify one of them.";
             }
 
-            if (amount.HasValue)
+            if (amountOption.HasValue)
             {
+                int amount;
+                try
+                {
+                    amount = checked((int)amountOption.Value);
+                }
+                catch (OverflowException)
+                {
+                    return "❌ Validation Error: Amount is too large (exceeds integer limit).";
+                }
+
                 if (amount <= 0)
                 {
                     return "❌ Validation Error: Amount must be greater than 0!";

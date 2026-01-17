@@ -13,6 +13,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
         private readonly LocalDbContext _dbContext;
         private readonly ILogger<AlkoStatCommand> _logger;
         private readonly IAlkoStatsCalculator _calculator;
+        private readonly AlkoStatValidator _validator;
 
         public override string CommandName => "alko-stat";
         public override string Description => "Shows alcohol statistics for the user.";
@@ -33,13 +34,15 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
             DiscordSocketClient client,
             LocalDbContext dbContext,
             ILogger<AlkoStatCommand> logger,
-            IAlkoStatsCalculator calculator
+            IAlkoStatsCalculator calculator,
+            AlkoStatValidator validator
         )
             : base(client, logger)
         {
             _dbContext = dbContext;
             _logger = logger;
             _calculator = calculator;
+            _validator = validator;
         }
 
         public override async Task<SlashCommandProperties> Register()
@@ -55,8 +58,16 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoStat
             try
             {
                 await command.DeferAsync(ephemeral: true);
-                var yearOption = command.Data.Options.FirstOrDefault(x => x.Name == "year")?.Value;
-                var year = yearOption != null ? Convert.ToInt32(yearOption) : DateTime.Now.Year;
+                
+                var yearOption = command.Data.Options.FirstOrDefault(x => x.Name == "year")?.Value as long?;
+                
+                if (!_validator.ValidateYear(yearOption, out var validYear, out var error))
+                {
+                    await command.FollowupAsync(error, ephemeral: true);
+                    return true;
+                }
+
+                var year = validYear ?? DateTime.UtcNow.Year;
 
                 var logs = await GetLogsForYear(command.User.Id, year);
                 if (!logs.Any())
