@@ -84,9 +84,11 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
                     return true;
                 }
 
-                await SaveStats(command, date!.Value, amount, percentage);
+                int? amountInt = amount.HasValue ? (int)amount.Value : null;
 
-                await SendResponse(command, amount, percentage, date.Value);
+                await SaveStats(command, date!.Value, amountInt, percentage);
+
+                await SendResponse(command, amountInt, percentage, date.Value);
             }
             catch (Exception ex)
             {
@@ -97,7 +99,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
             return true;
         }
 
-        private (int? amount, float? percentage, string? dateOption) GetOptions(
+        private (long? amount, float? percentage, string? dateOption) GetOptions(
             SocketSlashCommand command
         )
         {
@@ -108,7 +110,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoLog
             var dateOption =
                 command.Data.Options.FirstOrDefault(x => x.Name == "date")?.Value as string;
 
-            int? amount = amountOption != null ? Convert.ToInt32(amountOption) : null;
+            long? amount = amountOption != null ? Convert.ToInt64(amountOption) : null;
             float? percentage =
                 percentageOption != null ? Convert.ToSingle(percentageOption) : null;
 
