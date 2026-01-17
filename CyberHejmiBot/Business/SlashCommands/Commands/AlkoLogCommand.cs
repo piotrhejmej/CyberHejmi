@@ -87,7 +87,6 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in {CommandName}");
-                await command.RespondAsync("An unexpected error occurred.", ephemeral: true);
             }
 
             return true;
@@ -154,7 +153,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands
                         $"❌ Validation Error: Invalid date format '{dateOption}'. Please use DD-MM-YYYY.",
                         ephemeral: true
                     );
-                    return (false, default);
+                    return (false, DateTime.MinValue);
                 }
             }
 
