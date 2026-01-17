@@ -39,7 +39,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
             await command.DeferAsync(ephemeral: true);
 
             var commands = GetOrLoadCommands();
-            
+
             var embedBuilder = new EmbedBuilder()
                 .WithTitle("🍺 Alko-Tracker Helpers 🍺")
                 .WithDescription("Here are the commands you can use:")
@@ -49,7 +49,7 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
             {
                 var sb = new StringBuilder();
                 sb.AppendLine($"> {cmd.Description}");
-                
+
                 if (cmd.Options.Any())
                 {
                     sb.AppendLine("**Parameters:**");
@@ -64,13 +64,16 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
                     sb.AppendLine("*No parameters.*");
                 }
 
-                embedBuilder.AddField($"/{cmd.Name}", sb.ToString());
+                embedBuilder.AddField($"### '/{cmd.Name}'", sb.ToString());
             }
 
-            try 
+            try
             {
                 await command.User.SendMessageAsync(embed: embedBuilder.Build());
-                await command.FollowupAsync("📬 I've sent the help list to your DMs!", ephemeral: true);
+                await command.FollowupAsync(
+                    "📬 I've sent the help list to your DMs!",
+                    ephemeral: true
+                );
             }
             catch (Discord.Net.HttpException)
             {
@@ -112,6 +115,10 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
             return _cachedCommands;
         }
 
-        private record AlkoCommandInfo(string Name, string Description, IReadOnlyList<AdditionalOption> Options);
+        private record AlkoCommandInfo(
+            string Name,
+            string Description,
+            IReadOnlyList<AdditionalOption> Options
+        );
     }
 }
