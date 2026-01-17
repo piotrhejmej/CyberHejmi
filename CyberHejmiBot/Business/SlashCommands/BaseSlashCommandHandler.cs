@@ -19,12 +19,12 @@ namespace CyberHejmiBot.Business.SlashCommands
             Logger = logger;
         }
 
-        public virtual async Task Register()
+        public virtual async Task<SlashCommandProperties> Register()
         {
-            await Register(null);
+            return await Register(null);
         }
 
-        public virtual async Task Register(ICollection<AdditionalOption>? AdditionalOptions)
+        public virtual async Task<SlashCommandProperties> Register(ICollection<AdditionalOption>? AdditionalOptions)
         {
             var commandBuilder = new SlashCommandBuilder()
                .WithName(CommandName)
@@ -45,12 +45,13 @@ namespace CyberHejmiBot.Business.SlashCommands
 
             try
             {
-                await Client.CreateGlobalApplicationCommandAsync(commandBuilder.Build());
                 Client.SlashCommandExecuted += DoWork;
+                return commandBuilder.Build();
             }
             catch (Exception ex)
             {
-                Logger.LogError(ex, "Error registering command");
+                Logger.LogError(ex, "Error building command properties");
+                throw;
             }
         }
 

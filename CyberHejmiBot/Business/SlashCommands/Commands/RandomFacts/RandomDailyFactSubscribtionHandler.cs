@@ -24,9 +24,9 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.RandomFacts
             Logger = logger;
             DbContext = dbContext;
         }
-        public override Task Register()
+        public override async Task<SlashCommandProperties> Register()
         {
-            return base.Register(this.AdditionalOptions);
+            return await base.Register(this.AdditionalOptions);
         }
 
         public override async Task<bool> DoWork(SocketSlashCommand command)
