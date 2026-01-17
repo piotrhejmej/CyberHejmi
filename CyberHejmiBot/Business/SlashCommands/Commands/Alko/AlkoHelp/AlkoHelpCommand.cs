@@ -74,23 +74,28 @@ namespace CyberHejmiBot.Business.SlashCommands.Commands.Alko.AlkoHelp
             if (_cachedCommands != null)
                 return _cachedCommands;
 
-            lock (_lock)
+            // Build the command list outside the lock to avoid creating a service scope within the critical section.
+            List<AlkoCommandInfo> commands;
+            using (var scope = _serviceProvider.CreateScope())
             {
-                if (_cachedCommands != null)
-                    return _cachedCommands;
-
-                using var scope = _serviceProvider.CreateScope();
                 var registeredCommands = scope.ServiceProvider.GetRequiredService<
                     IEnumerable<BaseSlashCommandHandler<ISlashCommand>>
                 >();
-                
-                _cachedCommands = registeredCommands
+                commands = registeredCommands
                     .OfType<IAlkoCommand>()
                     .Select(x => new AlkoCommandInfo(x.CommandName, x.Description, x.Options))
                     .ToList();
-
-                return _cachedCommands;
             }
+
+            lock (_lock)
+            {
+                if (_cachedCommands == null)
+                {
+                    _cachedCommands = commands;
+                }
+            }
+
+            return _cachedCommands;
         }
 
         private record AlkoCommandInfo(string Name, string Description, IReadOnlyList<AdditionalOption> Options);
