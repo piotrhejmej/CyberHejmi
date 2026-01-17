@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using CyberHejmiBot.Data.Entities.Wisdom;
+﻿using CyberHejmiBot.Data.Entities.Wisdom;
 using CyberHejmiBot.Entities;
 
 namespace CyberHejmiBot.Data.Entities.Seed

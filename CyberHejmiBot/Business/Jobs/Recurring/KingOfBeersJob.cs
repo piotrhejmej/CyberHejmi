@@ -1,17 +1,12 @@
 using CyberHejmiBot.Business.Common;
-using Microsoft.Extensions.Logging;
 using CyberHejmiBot.Entities;
 using Discord;
 using Discord.Rest;
 using Discord.WebSocket;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.Jobs.Recurring
 {
@@ -58,7 +53,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 var userName = user?.Username ?? $"Użytkownik o ID {topKarmaUser.UserId}";
 
                 var imageUrl = await GetRandomGifUrl();
-                
+
                 var embedBuilder = new EmbedBuilder()
                     .WithTitle("👑 Król Piwek Miesiąca! 👑")
                     .WithDescription($"W tym miesiącu tytuł Króla Piwek 🍺 zdobywa **{userName}** z wynikiem **{topKarmaUser.Points}** piwek! 🍺\n\nGratulujemy i życzymy smacznego! 🍻")
@@ -78,7 +73,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
                 // Reset stats for this guild
                 await _dbContext.Database.ExecuteSqlRawAsync($"DELETE FROM \"{nameof(_dbContext.UserKarma)}\" WHERE \"GuildId\" = {{0}}", channel.GuildId);
             }
-            
+
             _logger.LogInformation("KingOfBeersJob: Completed.");
         }
 
@@ -114,7 +109,7 @@ namespace CyberHejmiBot.Business.Jobs.Recurring
             // Fallback to local files
             var resourcesPath = Path.Combine(AppContext.BaseDirectory, ImageConstants.ResourcesFolder, ImageConstants.ImagesFolder);
             var files = Directory.GetFiles(resourcesPath);
-            
+
             if (files.Any())
             {
                 return files[Random.Shared.Next(files.Length)];

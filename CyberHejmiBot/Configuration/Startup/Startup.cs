@@ -1,9 +1,9 @@
 ﻿using CyberHejmiBot.Business.Events;
 using CyberHejmiBot.Business.SlashCommands;
 using CyberHejmiBot.Business.TextCommands;
-using Microsoft.Extensions.Logging;
 using Discord;
 using Discord.WebSocket;
+using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Configuration.Startup
 {

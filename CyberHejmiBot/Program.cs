@@ -1,8 +1,6 @@
 ﻿using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Configuration.Logging.Hangfire;
-using CyberHejmiBot.Configuration.Logging;
-using CyberHejmiBot.Configuration.Settings;
 using CyberHejmiBot.Configuration.Startup;
 using CyberHejmiBot.Entities;
 using Discord.WebSocket;

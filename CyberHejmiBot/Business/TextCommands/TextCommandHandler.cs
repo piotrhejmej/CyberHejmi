@@ -1,9 +1,6 @@
-﻿using CyberHejmiBot.Business.Events.GuildEvents;
-using CyberHejmiBot.Business.SuperSpecial;
+﻿using System.Reflection;
 using Discord.Commands;
 using Discord.WebSocket;
-using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace CyberHejmiBot.Business.TextCommands
 {

@@ -1,11 +1,6 @@
 ﻿using CyberHejmiBot.Business.Events.GuildEvents.GuildEventEndedScope;
 using Discord.WebSocket;
 using Hangfire;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.Jobs
 {
@@ -15,7 +10,7 @@ namespace CyberHejmiBot.Business.Jobs
         Task RemoveTextChannel(ulong guildId, ulong textChannelId);
     }
 
-    public class RemoveEventTextChannelJob: IRemoveEventTextChannelJob
+    public class RemoveEventTextChannelJob : IRemoveEventTextChannelJob
     {
         private readonly DiscordSocketClient Client;
 

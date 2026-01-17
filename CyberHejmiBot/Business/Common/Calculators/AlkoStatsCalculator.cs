@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using CyberHejmiBot.Data.Entities.Alcohol;
 using Discord;
 

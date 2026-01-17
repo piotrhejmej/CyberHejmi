@@ -1,10 +1,7 @@
+using System.Text;
 using CyberHejmiBot.Entities;
-using Discord;
 using Discord.Commands;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.TextCommands.Modules
 {

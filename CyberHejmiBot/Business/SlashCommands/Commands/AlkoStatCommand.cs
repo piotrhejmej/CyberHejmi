@@ -1,8 +1,4 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using CyberHejmiBot.Business.Common.Calculators;
-using CyberHejmiBot.Business.SlashCommands;
 using CyberHejmiBot.Data.Entities.Alcohol;
 using CyberHejmiBot.Entities;
 using Discord;

@@ -1,13 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CyberHejmiBot.Business.Common
 {
-    public record RandomFactResult: WikiEventEntry
+    public record RandomFactResult : WikiEventEntry
     {
         public FactType FactType { get; set; }
     }
