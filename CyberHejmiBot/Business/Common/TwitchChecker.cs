@@ -58,7 +58,7 @@ namespace CyberHejmiBot.Business.Common
             return new CheckerResult
             {
                 IsSuccesfull = true,
-                Result = streamResponse?.data.Any() == true
+                Result = streamResponse?.data?.Any() == true
             };
         }
 
@@ -79,6 +79,9 @@ namespace CyberHejmiBot.Business.Common
             client.Dispose();
             client = new HttpClient();
 
+            if (authResponse?.access_token is null)
+                return (false, null, null);
+
             client.BaseAddress = new Uri(TWITCH_API_URI);
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {authResponse.access_token}");
             client.DefaultRequestHeaders.Add("Client-Id", TWITCH_CLIENT_ID);
@@ -89,26 +92,26 @@ namespace CyberHejmiBot.Business.Common
 
     internal class TwitchAuthResponse
     {
-        public string access_token { get; set; }
-        public string token_type { get; set; }
+        public string? access_token { get; set; }
+        public string? token_type { get; set; }
     }
 
     internal class TwitchStreamResponse
     {
-        public string id { get; set; }
-        public string user_id { get; set; }
-        public string user_name { get; set; }
-        public string game_id { get; set; }
-        public string type { get; set; }
-        public string title { get; set; }
+        public string? id { get; set; }
+        public string? user_id { get; set; }
+        public string? user_name { get; set; }
+        public string? game_id { get; set; }
+        public string? type { get; set; }
+        public string? title { get; set; }
         public int viewer_count { get; set; }
         public DateTime started_at { get; set; }
-        public string language { get; set; }
-        public string thumbnail_url { get; set; }
+        public string? language { get; set; }
+        public string? thumbnail_url { get; set; }
     }
 
     internal class TwitchSteamData
     {
-        public List<TwitchStreamResponse> data { get; set; }
+        public List<TwitchStreamResponse>? data { get; set; }
     }
 }

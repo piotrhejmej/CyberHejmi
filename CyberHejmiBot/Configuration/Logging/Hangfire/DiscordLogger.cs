@@ -22,7 +22,7 @@ namespace CyberHejmiBot.Configuration.Logging.Hangfire
 
         public string Name { get; set; }
 
-        public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception exception = null)
+        public bool Log(LogLevel logLevel, Func<string> messageFunc, Exception? exception = null)
         {
             if (logLevel == LogLevel.Error)
             {
