@@ -60,6 +60,10 @@ namespace CyberHejmiBot.Configuration.Logging
                     return;
 
                 var message = formatter(state, exception);
+
+                if (message.Contains("Server requested a reconnect"))
+                    return;
+                    
                 var embed = new EmbedBuilder()
                     .WithTitle(logLevel.ToString())
                     .WithDescription(message)

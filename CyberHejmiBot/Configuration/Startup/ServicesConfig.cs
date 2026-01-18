@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Discord;
 using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Business.Common.Calculators;
 using CyberHejmiBot.Business.Events;
@@ -27,7 +28,10 @@ namespace CyberHejmiBot.Configuration.Startup
     {
         public static void Register(IServiceCollection collection)
         {
-            var config = new DiscordSocketConfig();
+            var config = new DiscordSocketConfig
+            {
+                GatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites
+            };
             var commandServiceConfig = new CommandServiceConfig();
             var botSettings =
                 JsonConvert.DeserializeObject<BotSettings>(File.ReadAllText("BotSettings.json"))
