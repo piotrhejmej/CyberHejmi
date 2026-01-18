@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Discord;
 using CyberHejmiBot.Business.Common;
 using CyberHejmiBot.Business.Common.Calculators;
 using CyberHejmiBot.Business.Events;
@@ -14,6 +13,7 @@ using CyberHejmiBot.Configuration.Hangfire;
 using CyberHejmiBot.Configuration.Logging;
 using CyberHejmiBot.Configuration.Settings;
 using CyberHejmiBot.Entities;
+using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using MediatR;
@@ -30,7 +30,12 @@ namespace CyberHejmiBot.Configuration.Startup
         {
             var config = new DiscordSocketConfig
             {
-                GatewayIntents = GatewayIntents.AllUnprivileged & ~GatewayIntents.GuildInvites
+                GatewayIntents =
+                    GatewayIntents.Guilds
+                    | GatewayIntents.GuildMessages
+                    | GatewayIntents.GuildMessageReactions
+                    | GatewayIntents.GuildScheduledEvents
+                    | GatewayIntents.DirectMessages,
             };
             var commandServiceConfig = new CommandServiceConfig();
             var botSettings =
@@ -65,7 +70,10 @@ namespace CyberHejmiBot.Configuration.Startup
                 .AddSingleton<ILoggerProvider, DiscordChannelLoggerProvider>()
                 .AddScoped<ITwitchChecker, TwitchChecker>()
                 .AddScoped<IAlkoStatsCalculator, AlkoStatsCalculator>()
-                .AddScoped<Business.Common.Parsers.IDateParser, Business.Common.Parsers.DateParser>()
+                .AddScoped<
+                    Business.Common.Parsers.IDateParser,
+                    Business.Common.Parsers.DateParser
+                >()
                 .AddScoped<Business.SlashCommands.Commands.Alko.AlkoLog.AlkoLogValidator>()
                 .AddScoped<Business.SlashCommands.Commands.Alko.AlkoEntryRemove.AlkoEntryRemoveValidator>()
                 .AddScoped<Business.SlashCommands.Commands.Alko.AlkoEntryList.AlkoEntryListValidator>()

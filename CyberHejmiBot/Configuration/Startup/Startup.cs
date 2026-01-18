@@ -38,10 +38,16 @@ namespace CyberHejmiBot.Configuration.Startup
         public async Task Init()
         {
             Console.WriteLine(Environment.GetEnvironmentVariable("BOT_TOKEN"));
+            
+            // Subscribing to events before starting the client to avoid "intent without listener" warnings
+            await CommandHandler.InstallCommandsAsync();
+            await EventListener.StartAsync();
+            
+            Client.Log += LogAsync;
+            Client.Ready += Ready;
+
             await Client.LoginAsync(TokenType.Bot, Environment.GetEnvironmentVariable("BOT_TOKEN"));
             await Client.StartAsync();
-            Client.Ready += Ready;
-            Client.Log += LogAsync;
         }
 
         private Task LogAsync(LogMessage container)
@@ -73,9 +79,7 @@ namespace CyberHejmiBot.Configuration.Startup
 
         public async Task Ready()
         {
-            await CommandHandler.InstallCommandsAsync();
             await SlashCommandsConfig.RegisterSlashCommands();
-            await EventListener.StartAsync();
         }
     }
 }
