@@ -61,7 +61,7 @@ namespace CyberHejmiBot.Configuration.Logging
 
                 var message = formatter(state, exception);
 
-                if (message.Contains("Server requested a reconnect"))
+                if (ShouldIgnoreLog(message, exception))
                     return;
                     
                 var embed = new EmbedBuilder()
@@ -103,6 +103,34 @@ namespace CyberHejmiBot.Configuration.Logging
                 // Prevent infinite loops if logging fails
             }
         }
+
+        private bool ShouldIgnoreLog(string message, Exception? exception)
+        {
+            if (IgnoredPhrases.Any(phrase => message.Contains(phrase, StringComparison.OrdinalIgnoreCase)))
+                return true;
+
+            if (exception != null)
+            {
+                if (IgnoredPhrases.Any(phrase => exception.Message.Contains(phrase, StringComparison.OrdinalIgnoreCase)))
+                    return true;
+
+                if (exception.InnerException != null)
+                {
+                    if (IgnoredPhrases.Any(phrase => exception.InnerException.Message.Contains(phrase, StringComparison.OrdinalIgnoreCase)))
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static readonly string[] IgnoredPhrases = new[]
+        {
+            "Server requested a reconnect",
+            "WebSocket connection was closed",
+            "The remote party closed the WebSocket connection",
+            "The server sent close 1001"
+        };
 
         private static readonly Dictionary<LogLevel, Color> LogColors = new Dictionary<
             LogLevel,
