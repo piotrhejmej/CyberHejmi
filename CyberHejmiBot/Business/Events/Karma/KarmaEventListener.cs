@@ -3,6 +3,7 @@ using CyberHejmiBot.Entities;
 using Discord;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace CyberHejmiBot.Business.Events.Karma
@@ -10,13 +11,13 @@ namespace CyberHejmiBot.Business.Events.Karma
     public class KarmaEventListener : IKarmaEventListener
     {
         private readonly DiscordSocketClient _client;
-        private readonly LocalDbContext _dbContext;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<KarmaEventListener> _logger;
 
-        public KarmaEventListener(DiscordSocketClient client, LocalDbContext dbContext, ILogger<KarmaEventListener> logger)
+        public KarmaEventListener(DiscordSocketClient client, IServiceScopeFactory scopeFactory, ILogger<KarmaEventListener> logger)
         {
             _client = client;
-            _dbContext = dbContext;
+            _scopeFactory = scopeFactory;
             _logger = logger;
         }
 
@@ -49,22 +50,27 @@ namespace CyberHejmiBot.Business.Events.Karma
 
             var guildId = guildChannel.Guild.Id;
 
-            var userKarma = await _dbContext.UserKarma
-                .FirstOrDefaultAsync(x => x.UserId == message.Author.Id && x.GuildId == guildId);
-
-            if (userKarma == null)
+            using (var scope = _scopeFactory.CreateScope())
             {
-                userKarma = new UserKarma
-                {
-                    UserId = message.Author.Id,
-                    GuildId = guildId,
-                    Points = 0
-                };
-                await _dbContext.UserKarma.AddAsync(userKarma);
-            }
+                var dbContext = scope.ServiceProvider.GetRequiredService<LocalDbContext>();
 
-            userKarma.Points++;
-            await _dbContext.SaveChangesAsync();
+                var userKarma = await dbContext.UserKarma
+                    .FirstOrDefaultAsync(x => x.UserId == message.Author.Id && x.GuildId == guildId);
+
+                if (userKarma == null)
+                {
+                    userKarma = new UserKarma
+                    {
+                        UserId = message.Author.Id,
+                        GuildId = guildId,
+                        Points = 0
+                    };
+                    await dbContext.UserKarma.AddAsync(userKarma);
+                }
+
+                userKarma.Points++;
+                await dbContext.SaveChangesAsync();
+            }
         }
     }
 }
